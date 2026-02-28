@@ -35,7 +35,7 @@ permissions:
 jobs:
   lookup:
     name: Lookup model config
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     outputs:
       model_name: ${{ steps.config.outputs.model_name }}
       model_dir: ${{ steps.config.outputs.model_dir }}

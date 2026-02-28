@@ -1,5 +1,4 @@
-const CORS_PROXY_URL = 'https://cors-proxy.jonasneves.workers.dev';
-const GITHUB_CLIENT_ID = 'Ov23lioKDt8Os7hdiSEh';
+const GITHUB_CLIENT_ID = 'Ov23li3dnFMUNHbu1SjZ';
 const OAUTH_CALLBACK_ORIGIN = 'https://neevs.io';
 
 export interface GitHubAuth {
@@ -9,8 +8,8 @@ export interface GitHubAuth {
 }
 
 export async function connectGitHub(): Promise<GitHubAuth> {
-  const state = crypto.randomUUID();
-  const redirectUri = `${OAUTH_CALLBACK_ORIGIN}/`;
+  const state = crypto.randomUUID() + '|serverless-llm';
+  const redirectUri = `${OAUTH_CALLBACK_ORIGIN}/auth/`;
 
   const authUrl = new URL('https://github.com/login/oauth/authorize');
   authUrl.searchParams.set('client_id', GITHUB_CLIENT_ID);
@@ -34,36 +33,16 @@ export async function connectGitHub(): Promise<GitHubAuth> {
       return;
     }
 
-    const handleMessage = async (event: MessageEvent) => {
+    const handleMessage = (event: MessageEvent) => {
       if (event.origin !== OAUTH_CALLBACK_ORIGIN) return;
-      const { type, code, error } = event.data || {};
-      if (type !== 'oauth-callback') return;
+      const { type, auth } = event.data || {};
+      if (type !== 'gh-auth') return;
 
       window.removeEventListener('message', handleMessage);
       clearInterval(pollTimer);
 
-      if (error) { reject(new Error(error)); return; }
-      if (!code) { reject(new Error('No code received')); return; }
-
-      try {
-        const res = await fetch(`${CORS_PROXY_URL}/token`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ client_id: GITHUB_CLIENT_ID, code, redirect_uri: redirectUri })
-        });
-        const data = await res.json();
-        if (data.error || !data.access_token) throw new Error(data.error_description || data.error);
-
-        const userRes = await fetch('https://api.github.com/user', {
-          headers: { Authorization: `Bearer ${data.access_token}`, Accept: 'application/vnd.github+json' }
-        });
-        if (!userRes.ok) throw new Error('Failed to fetch GitHub user info');
-        const user = await userRes.json();
-
-        resolve({ token: data.access_token, username: user.login, name: user.name || undefined });
-      } catch (err) {
-        reject(err);
-      }
+      if (!auth) { reject(new Error('Authentication failed')); return; }
+      resolve({ token: auth.token, username: auth.login, name: auth.user?.name || undefined });
     };
 
     window.addEventListener('message', handleMessage);
