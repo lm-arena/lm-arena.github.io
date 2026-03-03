@@ -140,22 +140,22 @@ export function useModelsManager() {
     const endpoints: Record<string, string> = {};
     const isDev = window.location.hostname === 'localhost';
 
-    const subdomainMap: Record<string, string> = {
-      'qwen3-4b': 'qwen',
-      'phi-4-mini': 'phi',
-      'functiongemma-270m-it': 'functiongemma',
-      'smollm3-3b': 'smollm3',
-      'lfm2.5-1.2b-instruct': 'lfm2',
-      'dasd-4b-thinking': 'dasd',
-      'agentcpm-explore-4b': 'agentcpm',
-      'gemma-3-12b-it': 'gemma',
-      'llama-3.2-3b': 'llama',
-      'mistral-7b-instruct-v0.3': 'mistral',
-      'rnj-1-instruct': 'rnj',
-      'deepseek-r1-distill-qwen-1.5b': 'r1qwen',
-      'nanbeige4-3b-thinking': 'nanbeige',
-      'glm-4.7-flash': 'glm',
-      'gpt-oss-20b': 'gptoss',
+    const tunnelMap: Record<string, string> = {
+      'qwen3-4b':                    'e962064c-c15b-426a-8f10-8787d4a801af',
+      'phi-4-mini':                  'f69a59b8-7e30-4275-8760-7839fc8414d1',
+      'functiongemma-270m-it':       '64741385-fe1b-4114-96cf-d60c881093c3',
+      'smollm3-3b':                  '4922d311-cd56-4421-9f9b-690d974b6a5e',
+      'lfm2.5-1.2b-instruct':        '1b213ae7-692d-4719-a67d-282e1b9e4d22',
+      'dasd-4b-thinking':            'd0e212f9-12dd-4c6d-af12-ee17113ea68b',
+      'agentcpm-explore-4b':         '8150bbd6-180d-4e09-a377-de412b7e93e9',
+      'gemma-3-12b-it':              '880943b4-ffc9-491b-964e-7350cbea3d52',
+      'llama-3.2-3b':                'defebdbb-46c8-4c86-8cfc-492ce5c22d33',
+      'mistral-7b-instruct-v0.3':    '88d60f4d-3ef6-490f-bc72-71528f530af5',
+      'rnj-1-instruct':              'a534603f-4b07-49aa-9e9e-ad6526fa6232',
+      'deepseek-r1-distill-qwen-1.5b': 'e251134b-de3c-43cf-ad99-4f5c49cc1c48',
+      'nanbeige4-3b-thinking':       '476cf4a6-34cc-45b5-939b-e2bae41b6eab',
+      'glm-4.7-flash':               'cb7bea42-a89a-484a-8a9a-a4b34d1709e5',
+      'gpt-oss-20b':                 'cb81911a-a0ea-484a-bb0d-9544619ce00b',
     };
 
     const portMap: Record<string, number> = {
@@ -182,9 +182,9 @@ export function useModelsManager() {
           const port = portMap[model.id] || 8000;
           endpoints[model.id] = `http://localhost:${port}/v1`;
         } else {
-          const subdomain = subdomainMap[model.id];
-          if (subdomain) {
-            endpoints[model.id] = `https://${subdomain}.neevs.io/v1`;
+          const tunnelId = tunnelMap[model.id];
+          if (tunnelId) {
+            endpoints[model.id] = `https://${tunnelId}.cfargotunnel.com/v1`;
           }
         }
       } else if (model.type === 'github') {

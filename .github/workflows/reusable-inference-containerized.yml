@@ -256,7 +256,7 @@ jobs:
         run: |
           curl -fsSL -o cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64.deb
           sudo dpkg -i cloudflared.deb
-          cloudflared tunnel --no-autoupdate run --token "$TUNNEL_TOKEN" > /tmp/cloudflared.log 2>&1 &
+          cloudflared tunnel --no-autoupdate --url http://localhost:${{ inputs.port }} run --token "$TUNNEL_TOKEN" > /tmp/cloudflared.log 2>&1 &
           sleep 5
           cat /tmp/cloudflared.log
           echo "✓ Cloudflared started"
@@ -304,7 +304,7 @@ jobs:
               "$(date '+%H:%M:%S')" "$SERVER_STATUS" "$TUNNEL_STATUS" "$((ELAPSED/60))" "$((REMAINING/60))"
 
             [ "$SERVER_STATUS" != "running" ] && docker start inference-server
-            [ "$TUNNEL_STATUS" != "running" ] && cloudflared tunnel --no-autoupdate run --token "$TUNNEL_TOKEN" >> /tmp/cloudflared.log 2>&1 &
+            [ "$TUNNEL_STATUS" != "running" ] && cloudflared tunnel --no-autoupdate --url http://localhost:$PORT run --token "$TUNNEL_TOKEN" >> /tmp/cloudflared.log 2>&1 &
 
             [ "$ELAPSED" -gt "$DURATION" ] && break
             sleep 30
