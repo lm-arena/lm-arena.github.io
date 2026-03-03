@@ -1,17 +1,8 @@
-# =============================================================================
-# Serverless LLM - Unified Docker Compose with Profiles
-# =============================================================================
 # Usage:
-#   docker-compose --profile all up        # Start all inference servers
-#   docker-compose --profile qwen up       # Start qwen
-#   docker-compose --profile qwen --profile phi up  # Start qwen + phi
-#
-# Available profiles: all, qwen, phi, llama, mistral, gemma, r1qwen, rnj, lfm2, smollm3, nanbeige, functiongemma, gptoss
-# =============================================================================
+#   docker compose --profile all up        # Start all inference servers
+#   docker compose --profile qwen up       # Start qwen
+#   docker compose --profile qwen --profile phi up  # Start qwen + phi
 
-version: '3.8'
-
-# YAML anchors for DRY configuration
 x-common-env: &common-env
   HF_TOKEN: ${HF_TOKEN}
 
@@ -23,10 +14,6 @@ x-inference-common: &inference-common
     <<: *common-env
 
 services:
-  # =============================================================================
-  # Inference Servers (activated by profiles)
-  # =============================================================================
-  
   qwen:
     <<: *inference-common
     build:

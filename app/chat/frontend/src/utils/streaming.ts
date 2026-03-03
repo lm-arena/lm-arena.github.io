@@ -53,7 +53,11 @@ async function* streamModel(
 
   if (!response.ok) {
     let msg = response.statusText;
-    try { msg = (await response.json()).error?.message || msg; } catch {}
+    try {
+      msg = (await response.json()).error?.message || msg;
+    } catch {
+      // Use statusText as fallback
+    }
     yield { event: 'error', model_id: model, error: true, content: msg };
     return;
   }
@@ -129,10 +133,10 @@ async function* mergeStreams(
   }
 }
 
-export const fetchChatStream = async (
+export async function fetchChatStream(
   payload: ChatStreamPayload,
   signal?: AbortSignal,
-): Promise<AsyncGenerator<ChatStreamEvent>> => {
+): Promise<AsyncGenerator<ChatStreamEvent>> {
   const { models, ...rest } = payload;
 
   if (models.length === 1) {
@@ -142,21 +146,19 @@ export const fetchChatStream = async (
   return mergeStreams(
     models.map(model => streamModel(model, rest, signal)),
   );
-};
+}
 
-export const streamSseEvents = async (
+// Errors from onEvent propagate to the caller (e.g., rate limit detection triggering fallback)
+export async function streamSseEvents(
   eventStream: AsyncGenerator<ChatStreamEvent>,
   onEvent: (data: ChatStreamEvent) => void,
-): Promise<void> => {
+): Promise<void> {
   try {
     for await (const event of eventStream) {
-      // Don't catch errors from onEvent - let them propagate to the caller
-      // This is critical for error handling (e.g., rate limit detection triggering fallback)
       onEvent(event);
     }
   } catch (e) {
     console.error('Stream error:', e);
     throw e;
   }
-};
-
+}

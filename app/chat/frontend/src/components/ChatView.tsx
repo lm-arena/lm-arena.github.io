@@ -129,7 +129,7 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
     getModelEndpoints,
 }, ref) => {
     const [inputFocused, setInputFocused] = useState(false);
-    const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
+    const [copiedMessageId, setCopiedMessageId] = useState<number | null>(null);
     const [streamingResponses, setStreamingResponses] = useState<Map<string, string>>(new Map());
     const [streamingTiming, setStreamingTiming] = useState<Map<string, ExecutionTimeData>>(new Map());
     const abortRefs = useRef<Map<string, AbortController>>(new Map());
@@ -144,10 +144,8 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
     const gestureCtx = useGestureOptional();
     const isMiddleFinger = gestureCtx?.gestureState?.gesture === 'Middle_Finger';
 
-    // O(1) model lookup map
     const modelMap = useMemo(() => new Map(models.map(m => [m.id, m])), [models]);
 
-    // Cleanup refs on unmount
     useEffect(() => {
         return () => {
             if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
@@ -171,7 +169,6 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
             const target = event.target as HTMLElement;
             if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
 
-            // Check if it's a printable character (single character, not a modifier key)
             if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
                 if (inputRef.current) {
                     inputRef.current.focus();
@@ -182,14 +179,12 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
-    // Check if user is near bottom
     const isNearBottom = useCallback(() => {
         if (!scrollRef.current) return true;
         const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
         return scrollHeight - scrollTop - clientHeight < 100;
     }, []);
 
-    // Track user scroll to detect when they scroll away
     useEffect(() => {
         const el = scrollRef.current;
         if (!el) return;
@@ -202,14 +197,12 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
         return () => el.removeEventListener('scroll', handleScroll);
     }, [isNearBottom]);
 
-    // Smart auto-scroll: only scroll if user hasn't scrolled away
     const smartScroll = useCallback(() => {
         if (!userScrolledAwayRef.current && scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
     }, []);
 
-    // Auto-scroll when messages change (if user is at bottom)
     useEffect(() => {
         smartScroll();
     }, [messages, streamingResponses, smartScroll]);
@@ -220,10 +213,8 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
         const modelIds = Array.from(selectedModels);
         if (modelIds.length === 0) return;
 
-        // Reset user scroll tracking on new message
         userScrolledAwayRef.current = false;
 
-        // Initialize refs and state
         const now = Date.now();
         streamingContentRef.current = new Map(modelIds.map(id => [id, '']));
         streamingTimingRef.current = new Map(modelIds.map(id => [id, { startTime: now }]));
@@ -237,20 +228,16 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
 
         const baseMessages = [...messages, userMessage].map(m => ({ role: m.role, content: m.content }));
 
-        // Build system prompts
         const systemPrompts: Array<{ role: 'system'; content: string }> = [];
 
-        // Add UI Builder prompt if enabled
         if (uiBuilderEnabled) {
             systemPrompts.push({ role: 'system', content: UI_BUILDER_PROMPT });
         }
 
-        // Gesture mode: add gesture-specific context
         if (fromGesture) {
             systemPrompts.push({ role: 'system', content: `User is using gesture control. Available gestures: 👍 (yes), 👎 (no), 👋 (hello), "ok", "thanks", "stop", pointing finger (select buttons).` });
         }
 
-        // Easter egg: Angry robot context for middle finger gesture
         const isAngryTrigger = text === "🖕" || text.toLowerCase().includes("middle finger");
         if (isAngryTrigger) {
             systemPrompts.push({ role: 'system', content: "The user is showing you their middle finger. Respond with humorous, over-the-top mock indignation. Play along with the 'angry robot' persona." });
@@ -262,7 +249,6 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
         let completedCount = 0;
         const totalCount = modelIds.length;
 
-        // Stream all selected models in parallel - each completes independently
         const streamPromises = modelIds.map(async (modelId) => {
             const model = modelMap.get(modelId);
             const startTime = Date.now();
@@ -381,7 +367,7 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
         const msg = messages[idx];
         if (msg?.role === 'assistant') {
             navigator.clipboard.writeText(msg.content);
-            setCopiedMessageId(`${idx}`);
+            setCopiedMessageId(idx);
             if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
             copyTimeoutRef.current = setTimeout(() => setCopiedMessageId(null), 2000);
         }
@@ -398,7 +384,6 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
 
     return (
         <div className="flex flex-col h-full w-full relative">
-            {/* Scrollable messages area */}
             <div
                 ref={scrollRef}
                 data-no-arena-scroll
@@ -441,7 +426,7 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
                             idx={idx}
                             gesturesActive={gesturesActive}
                             uiBuilderEnabled={uiBuilderEnabled}
-                            isCopied={copiedMessageId === `${idx}`}
+                            isCopied={copiedMessageId === idx}
                             onCopy={copyResponse}
                             onGestureSelect={handleGestureSelect}
                         />
@@ -473,7 +458,6 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
                 </div>
             </div>
 
-            {/* Bottom area: Input */}
             <div className="fixed bottom-0 left-0 right-0 z-[99] flex flex-col items-center gap-2 px-4 pb-4" style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))' }}>
                 <PromptInput
                     inputRef={inputRef}
