@@ -137,19 +137,22 @@ def create_inference_app(config: ModelConfig) -> FastAPI:
         allow_headers=["*"],
     )
 
+    def _env_bool(name: str) -> bool:
+        return os.getenv(name, "").strip().lower() in {"1", "true", "yes", "on"}
+
     # Model state and concurrency gate
     llm: Optional[Llama] = None
+    n_ctx = int(os.getenv("N_CTX", str(config.default_n_ctx)))
+    n_threads = int(os.getenv("N_THREADS", str(config.default_n_threads)))
+    n_batch = int(os.getenv("N_BATCH", str(config.n_batch)))
     max_concurrent = int(os.getenv("MAX_CONCURRENT", "2"))
     inference_lock = asyncio.Semaphore(max_concurrent)
-    always_include_perf = os.getenv("ALWAYS_INCLUDE_PERF", "").strip().lower() in {"1", "true", "yes", "on"}
-    log_perf = os.getenv("LOG_PERF", "").strip().lower() in {"1", "true", "yes", "on"}
+    always_include_perf = _env_bool("ALWAYS_INCLUDE_PERF")
+    log_perf = _env_bool("LOG_PERF")
 
     def _load_model():
         nonlocal llm
         model_path = _download_model(config.default_repo, config.default_file)
-        n_ctx = int(os.getenv("N_CTX", str(config.default_n_ctx)))
-        n_threads = int(os.getenv("N_THREADS", str(config.default_n_threads)))
-        n_batch = int(os.getenv("N_BATCH", str(config.n_batch)))
 
         # KV-cache quantization (Q8_0) requires flash_attn
         kv_cache_quant = os.getenv("KV_CACHE_QUANT", "").strip().lower()
@@ -220,9 +223,9 @@ def create_inference_app(config: ModelConfig) -> FastAPI:
             "repo": os.getenv("MODEL_REPO", config.default_repo),
             "file": os.getenv("MODEL_FILE", config.default_file),
             "cpu_count": os.cpu_count(),
-            "n_ctx": int(os.getenv("N_CTX", str(config.default_n_ctx))),
-            "n_threads": int(os.getenv("N_THREADS", str(config.default_n_threads))),
-            "n_batch": int(os.getenv("N_BATCH", str(config.n_batch))),
+            "n_ctx": n_ctx,
+            "n_threads": n_threads,
+            "n_batch": n_batch,
             "max_concurrent": max_concurrent,
             "active_requests": max_concurrent - inference_lock._value,
             "available_capacity": inference_lock._value,
@@ -315,9 +318,9 @@ def create_inference_app(config: ModelConfig) -> FastAPI:
                         "tokenize_ms": tokenize_ms,
                         "total_ms": total_ms,
                         "completion_tps": completion_tps,
-                        "n_ctx": int(os.getenv("N_CTX", str(config.default_n_ctx))),
-                        "n_threads": int(os.getenv("N_THREADS", str(config.default_n_threads))),
-                        "n_batch": int(os.getenv("N_BATCH", str(config.n_batch))),
+                        "n_ctx": n_ctx,
+                        "n_threads": n_threads,
+                        "n_batch": n_batch,
                         "max_concurrent": max_concurrent,
                     }
 
@@ -394,9 +397,9 @@ def create_inference_app(config: ModelConfig) -> FastAPI:
                     "compute_ms": compute_ms,
                     "total_ms": total_ms,
                     "completion_tps": completion_tps,
-                    "n_ctx": int(os.getenv("N_CTX", str(config.default_n_ctx))),
-                    "n_threads": int(os.getenv("N_THREADS", str(config.default_n_threads))),
-                    "n_batch": int(os.getenv("N_BATCH", str(config.n_batch))),
+                    "n_ctx": n_ctx,
+                    "n_threads": n_threads,
+                    "n_batch": n_batch,
                     "max_concurrent": max_concurrent,
                 }
 

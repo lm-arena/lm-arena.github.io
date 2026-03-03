@@ -39,15 +39,15 @@ class LlamaServerConfig:
 
 def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
     """Create a FastAPI app that downloads a model, starts llama-server, and proxies requests."""
-    MODEL_REPO = os.getenv("MODEL_REPO", config.default_repo)
-    MODEL_FILE = os.getenv("MODEL_FILE", config.default_file)
-    N_CTX = int(os.getenv("N_CTX", str(config.n_ctx)))
-    N_THREADS = int(os.getenv("N_THREADS", str(config.n_threads)))
-    N_BATCH = int(os.getenv("N_BATCH", str(config.n_batch)))
-    MAX_CONCURRENT = int(os.getenv("MAX_CONCURRENT", str(config.max_concurrent)))
-    KV_CACHE_QUANT = os.getenv("KV_CACHE_QUANT", "true").lower() in ("true", "1", "yes")
-    HF_TOKEN = os.getenv("HF_TOKEN")
-    STARTUP_TIMEOUT = int(os.getenv("STARTUP_TIMEOUT", str(config.startup_timeout)))
+    model_repo = os.getenv("MODEL_REPO", config.default_repo)
+    model_file = os.getenv("MODEL_FILE", config.default_file)
+    n_ctx = int(os.getenv("N_CTX", str(config.n_ctx)))
+    n_threads = int(os.getenv("N_THREADS", str(config.n_threads)))
+    n_batch = int(os.getenv("N_BATCH", str(config.n_batch)))
+    max_concurrent = int(os.getenv("MAX_CONCURRENT", str(config.max_concurrent)))
+    kv_cache_quant = os.getenv("KV_CACHE_QUANT", "true").lower() in ("true", "1", "yes")
+    hf_token = os.getenv("HF_TOKEN")
+    startup_timeout = int(os.getenv("STARTUP_TIMEOUT", str(config.startup_timeout)))
 
     app = FastAPI(
         title=f"{config.display_name} Inference API",
@@ -64,7 +64,6 @@ def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
 
     llama_process: Optional[subprocess.Popen] = None
     http_client: Optional[httpx.AsyncClient] = None
-    log_file = None
 
     def check_llama_server():
         llama_path = "/usr/local/bin/llama-server"
@@ -85,44 +84,40 @@ def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
     def download_model() -> str:
         cache_dir = os.getenv("HF_HOME", "/app/.cache/huggingface")
 
-        logger.info(f"Downloading model: {MODEL_REPO}/{MODEL_FILE}")
+        logger.info(f"Downloading model: {model_repo}/{model_file}")
         model_path = hf_hub_download(
-            repo_id=MODEL_REPO,
-            filename=MODEL_FILE,
+            repo_id=model_repo,
+            filename=model_file,
             cache_dir=cache_dir,
-            token=HF_TOKEN,
+            token=hf_token,
         )
         logger.info(f"Model downloaded to: {model_path}")
         return model_path
 
-    LOG_PATH = "/tmp/llama-server.log"
+    log_path = "/tmp/llama-server.log"
 
     def read_server_log() -> str:
-        if log_file:
-            log_file.flush()
         try:
-            with open(LOG_PATH, "r") as f:
+            with open(log_path, "r") as f:
                 return f.read()
         except Exception:
             return "(log unavailable)"
 
     def start_llama_server(model_path: str) -> subprocess.Popen:
-        nonlocal log_file
-
         cmd = [
             "/usr/local/bin/llama-server",
             "--model", model_path,
             "--host", "127.0.0.1",
             "--port", str(LLAMA_SERVER_PORT),
-            "--ctx-size", str(N_CTX),
-            "--threads", str(N_THREADS),
-            "--batch-size", str(N_BATCH),
-            "--parallel", str(MAX_CONCURRENT),
+            "--ctx-size", str(n_ctx),
+            "--threads", str(n_threads),
+            "--batch-size", str(n_batch),
+            "--parallel", str(max_concurrent),
             "--cont-batching",
             "--flash-attn", "auto",
         ]
 
-        if KV_CACHE_QUANT:
+        if kv_cache_quant:
             cmd.extend(["--cache-type-k", "q8_0", "--cache-type-v", "q8_0"])
 
         if config.extra_args:
@@ -130,11 +125,11 @@ def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
 
         logger.info(f"Starting llama-server: {' '.join(cmd)}")
 
-        log_file = open(LOG_PATH, "w", buffering=1)
+        server_log = open(log_path, "w", buffering=1)
 
         process = subprocess.Popen(
             cmd,
-            stdout=log_file,
+            stdout=server_log,
             stderr=subprocess.STDOUT,
             text=True,
             bufsize=1,
@@ -143,7 +138,7 @@ def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
         start_time = time.time()
         check_count = 0
 
-        while time.time() - start_time < STARTUP_TIMEOUT:
+        while time.time() - start_time < startup_timeout:
             check_count += 1
             elapsed = int(time.time() - start_time)
 
@@ -164,8 +159,8 @@ def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
 
             time.sleep(1)
 
-        logger.error(f"llama-server timeout after {STARTUP_TIMEOUT}s\n{read_server_log()}")
-        raise RuntimeError(f"llama-server did not become healthy in {STARTUP_TIMEOUT}s")
+        logger.error(f"llama-server timeout after {startup_timeout}s\n{read_server_log()}")
+        raise RuntimeError(f"llama-server did not become healthy in {startup_timeout}s")
 
     def cleanup():
         nonlocal llama_process
@@ -221,13 +216,13 @@ def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
             "status": "healthy",
             "model": config.display_name,
             "format": "GGUF",
-            "repo": MODEL_REPO,
-            "file": MODEL_FILE,
-            "n_ctx": N_CTX,
-            "n_threads": N_THREADS,
-            "n_batch": N_BATCH,
-            "max_concurrent": MAX_CONCURRENT,
-            "kv_cache_quant": KV_CACHE_QUANT,
+            "repo": model_repo,
+            "file": model_file,
+            "n_ctx": n_ctx,
+            "n_threads": n_threads,
+            "n_batch": n_batch,
+            "max_concurrent": max_concurrent,
+            "kv_cache_quant": kv_cache_quant,
             "cpu_count": os.cpu_count(),
             "openblas_num_threads": os.getenv("OPENBLAS_NUM_THREADS"),
             "omp_num_threads": os.getenv("OMP_NUM_THREADS"),

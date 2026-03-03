@@ -10,6 +10,12 @@ interface ExecutionTimeDisplayProps {
   isFastestTotal?: boolean;
 }
 
+function formatTotalTime(totalSeconds: string | null, isStreaming: boolean): string {
+  if (totalSeconds) return `${totalSeconds}s`;
+  if (isStreaming) return '...';
+  return '—';
+}
+
 export default function ExecutionTimeDisplay({ times, isFastestTTFT, isFastestTotal }: ExecutionTimeDisplayProps) {
   const hasStart = times?.startTime != null;
   const hasEnd = times?.endTime != null;
@@ -30,11 +36,7 @@ export default function ExecutionTimeDisplay({ times, isFastestTTFT, isFastestTo
         title={isFastestTotal ? 'Fastest' : undefined}
       >
         <span className={isFastestTotal ? undefined : 'text-slate-400'}>TIME</span>{' '}
-        {totalSeconds
-          ? `${totalSeconds}s`
-          : hasStart && !hasEnd
-            ? '...'
-            : '—'}
+        {formatTotalTime(totalSeconds, hasStart && !hasEnd)}
       </span>
       {ttftSeconds && (
         <span

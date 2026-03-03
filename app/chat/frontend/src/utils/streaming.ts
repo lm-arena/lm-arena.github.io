@@ -131,10 +131,10 @@ async function* mergeStreams(
   }
 }
 
-export async function fetchChatStream(
+export function fetchChatStream(
   payload: ChatStreamPayload,
   signal?: AbortSignal,
-): Promise<AsyncGenerator<ChatStreamEvent>> {
+): AsyncGenerator<ChatStreamEvent> {
   const { models, ...rest } = payload;
 
   if (models.length === 1) {

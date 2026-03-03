@@ -252,18 +252,16 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
         let completedCount = 0;
         const totalCount = modelIds.length;
 
+        function appendAssistantMessage(fields: Omit<ChatMessage, 'role'>) {
+            setMessages(prev => [...prev, { role: 'assistant', ...fields }]);
+        }
+
         const streamPromises = modelIds.map(async (modelId) => {
             const model = modelMap.get(modelId);
             const startTime = Date.now();
 
             if (!model) {
-                setMessages(prev => [...prev, {
-                    role: 'assistant',
-                    content: `Model ${modelId} not found`,
-                    modelId,
-                    modelName: modelId,
-                    error: true,
-                }]);
+                appendAssistantMessage({ content: `Model ${modelId} not found`, modelId, modelName: modelId, error: true });
                 completedCount++;
                 if (completedCount === totalCount) setIsGenerating(false);
                 return;
@@ -273,7 +271,7 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
             abortRefs.current.set(modelId, controller);
 
             try {
-                const stream = await fetchChatStream({
+                const stream = fetchChatStream({
                     models: [modelId],
                     messages: apiMessages,
                     max_tokens: 4096,
@@ -310,23 +308,16 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
 
                 const endTime = Date.now();
 
-                setMessages(prev => [...prev, {
-                    role: 'assistant',
+                appendAssistantMessage({
                     content: content || '(empty response)',
                     modelId,
                     modelName: model.name,
                     timing: { startTime, firstTokenTime, endTime },
                     error: hasError,
-                }]);
+                });
             } catch (err: any) {
                 if (err.name !== 'AbortError') {
-                    setMessages(prev => [...prev, {
-                        role: 'assistant',
-                        content: err.message || 'Request failed',
-                        modelId,
-                        modelName: model.name,
-                        error: true,
-                    }]);
+                    appendAssistantMessage({ content: err.message || 'Request failed', modelId, modelName: model.name, error: true });
                 }
             } finally {
                 abortRefs.current.delete(modelId);
