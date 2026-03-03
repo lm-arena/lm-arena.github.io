@@ -146,7 +146,6 @@ def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
             "--parallel", str(MAX_CONCURRENT),
             "--cont-batching",
             "--flash-attn", "auto",
-            "--mmap",
         ]
 
         if KV_CACHE_QUANT:
