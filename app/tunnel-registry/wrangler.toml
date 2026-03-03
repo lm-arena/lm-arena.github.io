@@ -1,0 +1,7 @@
+name = "tunnel-registry"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "TUNNELS_KV"
+id = "d21eb458257a413cbc893dbe951e91e6"

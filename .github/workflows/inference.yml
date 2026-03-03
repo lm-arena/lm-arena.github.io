@@ -85,4 +85,4 @@ jobs:
       duration_hours: ${{ inputs.duration_hours || '5' }}
     secrets:
       hf_token: ${{ secrets.HF_TOKEN }}
-      tunnels_json: ${{ secrets.TUNNELS_JSON }}
+      tunnel_write_key: ${{ secrets.TUNNEL_WRITE_KEY }}

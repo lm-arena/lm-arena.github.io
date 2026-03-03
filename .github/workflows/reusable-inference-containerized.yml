@@ -30,7 +30,7 @@ on:
     secrets:
       hf_token:
         required: true
-      tunnels_json:
+      tunnel_write_key:
         required: true
 
 jobs:
@@ -219,30 +219,40 @@ jobs:
             exit 1
           fi
 
-      - name: Get tunnel token
-        id: tunnel_token
-        env:
-          TUNNELS_JSON: ${{ secrets.tunnels_json }}
-        run: |
-          TOKEN=$(echo "$TUNNELS_JSON" | jq -r '."${{ inputs.model_name }}"')
-          if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
-            echo "❌ No tunnel token for ${{ inputs.model_name }} — run: make tunnels-secret"
-            exit 1
-          fi
-          echo "::add-mask::$TOKEN"
-          echo "token=$TOKEN" >> $GITHUB_OUTPUT
-          echo "✓ Tunnel token configured for ${{ inputs.model_name }}"
-
       - name: Start cloudflared
+        id: cloudflared
         env:
-          TUNNEL_TOKEN: ${{ steps.tunnel_token.outputs.token }}
+          TUNNEL_WRITE_KEY: ${{ secrets.tunnel_write_key }}
         run: |
           curl -fsSL -o cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64.deb
           sudo dpkg -i cloudflared.deb
-          cloudflared tunnel --no-autoupdate --url http://localhost:${{ inputs.port }} run --token "$TUNNEL_TOKEN" > /tmp/cloudflared.log 2>&1 &
-          sleep 5
-          cat /tmp/cloudflared.log
-          echo "✓ Cloudflared started"
+          cloudflared tunnel --no-autoupdate --url http://localhost:${{ inputs.port }} > /tmp/cloudflared.log 2>&1 &
+
+          # Wait for quick tunnel URL to appear in log (up to 60s)
+          TUNNEL_URL=""
+          for i in {1..30}; do
+            TUNNEL_URL=$(grep -o 'https://[a-z0-9-]*\.trycloudflare\.com' /tmp/cloudflared.log | head -1)
+            [ -n "$TUNNEL_URL" ] && break
+            sleep 2
+          done
+
+          if [ -z "$TUNNEL_URL" ]; then
+            echo "❌ Failed to get tunnel URL"
+            cat /tmp/cloudflared.log
+            exit 1
+          fi
+
+          echo "::add-mask::$TUNNEL_URL"
+          echo "tunnel_url=$TUNNEL_URL" >> $GITHUB_OUTPUT
+          echo "✓ Tunnel ready: $TUNNEL_URL"
+
+          # Register with tunnel registry
+          curl -fsSL -X PUT \
+            -H "Authorization: Bearer $TUNNEL_WRITE_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{\"url\": \"$TUNNEL_URL\"}" \
+            "https://tunnel-registry.jonasneves.workers.dev/tunnel/${{ inputs.model_name }}"
+          echo "✓ Registered tunnel for ${{ inputs.model_name }}"
 
       - name: Cancel previous workflow
         if: steps.find_previous.outputs.previous_run_id != ''
@@ -260,9 +270,32 @@ jobs:
       - name: Monitor
         env:
           PORT: ${{ inputs.port }}
-          TUNNEL_TOKEN: ${{ steps.tunnel_token.outputs.token }}
+          TUNNEL_WRITE_KEY: ${{ secrets.tunnel_write_key }}
+          MODEL_NAME: ${{ inputs.model_name }}
         run: |
+          REGISTRY="https://tunnel-registry.jonasneves.workers.dev"
+
+          register_tunnel() {
+            local url
+            # Wait for URL to appear after restart
+            for i in {1..15}; do
+              url=$(grep -o 'https://[a-z0-9-]*\.trycloudflare\.com' /tmp/cloudflared.log | tail -1)
+              [ -n "$url" ] && break
+              sleep 2
+            done
+            [ -z "$url" ] && return
+            curl -fsSL -X PUT \
+              -H "Authorization: Bearer $TUNNEL_WRITE_KEY" \
+              -H "Content-Type: application/json" \
+              -d "{\"url\": \"$url\"}" \
+              "$REGISTRY/tunnel/$MODEL_NAME" > /dev/null || true
+            echo "✓ Re-registered tunnel: $url"
+          }
+
           cleanup() {
+            curl -fsSL -X DELETE \
+              -H "Authorization: Bearer $TUNNEL_WRITE_KEY" \
+              "$REGISTRY/tunnel/$MODEL_NAME" > /dev/null || true
             docker stop inference-server 2>/dev/null || true
             docker rm inference-server 2>/dev/null || true
             pkill cloudflared 2>/dev/null || true
@@ -287,7 +320,11 @@ jobs:
               "$(date '+%H:%M:%S')" "$SERVER_STATUS" "$TUNNEL_STATUS" "$((ELAPSED/60))" "$((REMAINING/60))"
 
             [ "$SERVER_STATUS" != "running" ] && docker start inference-server
-            [ "$TUNNEL_STATUS" != "running" ] && cloudflared tunnel --no-autoupdate --url http://localhost:$PORT run --token "$TUNNEL_TOKEN" >> /tmp/cloudflared.log 2>&1 &
+            if [ "$TUNNEL_STATUS" != "running" ]; then
+              > /tmp/cloudflared.log
+              cloudflared tunnel --no-autoupdate --url http://localhost:$PORT >> /tmp/cloudflared.log 2>&1 &
+              register_tunnel
+            fi
 
             [ "$ELAPSED" -gt "$DURATION" ] && break
             sleep 30

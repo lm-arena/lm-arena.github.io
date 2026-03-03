@@ -17,10 +17,13 @@ interface ModelsApiResponse {
   models: ModelsApiModel[];
 }
 
+const TUNNEL_REGISTRY = 'https://tunnel-registry.jonasneves.workers.dev';
+
 export function useModelsManager() {
   const [modelsData, setModelsData] = useState<Model[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [tunnelUrls, setTunnelUrls] = useState<Record<string, string>>({});
 
   // Multi-model selection (for Compare, Analyze, Debate, Personalities)
   const [persistedSelected, setPersistedSelected] = usePersistedSetting<string[] | null>('playground_selected_models', null);
@@ -71,6 +74,13 @@ export function useModelsManager() {
         });
 
       setModelsData(apiModels);
+
+      // Fetch active tunnel URLs from registry (best-effort)
+      fetch(`${TUNNEL_REGISTRY}/tunnels`)
+        .then(r => r.ok ? r.json() : {})
+        .then(setTunnelUrls)
+        .catch(() => {});
+
       setIsLoading(false);
 
       if (!isSelectionInitialized.current) {
@@ -146,8 +156,8 @@ export function useModelsManager() {
         const service = SERVICES.find(s => s.modelId === model.id);
         if (isDev) {
           endpoints[model.id] = `http://localhost:${service?.localPort ?? 8000}/v1`;
-        } else if (service?.tunnelId) {
-          endpoints[model.id] = `https://${service.tunnelId}.cfargotunnel.com/v1`;
+        } else if (service && tunnelUrls[service.key]) {
+          endpoints[model.id] = `${tunnelUrls[service.key]}/v1`;
         }
       } else if (model.type === 'github') {
         endpoints[model.id] = 'https://models.github.ai/inference';
@@ -155,7 +165,7 @@ export function useModelsManager() {
     });
 
     return endpoints;
-  }, []);
+  }, [tunnelUrls]);
 
   return {
     modelsData,
