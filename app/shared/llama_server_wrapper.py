@@ -3,8 +3,6 @@ Shared llama-server Subprocess Wrapper
 
 Base infrastructure for models that require native llama-server instead of
 llama-cpp-python bindings (due to architecture incompatibilities).
-
-Used by: LFM2, RNJ
 """
 
 import atexit
@@ -14,7 +12,7 @@ import signal
 import subprocess
 import time
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import List, Optional
 
 import httpx
 from fastapi import FastAPI, HTTPException, Request
@@ -30,7 +28,6 @@ LLAMA_SERVER_PORT = 8080
 
 @dataclass
 class LlamaServerConfig:
-    """Configuration for llama-server wrapper"""
     model_id: str
     display_name: str
     owned_by: str
@@ -46,20 +43,7 @@ class LlamaServerConfig:
 
 
 def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
-    """
-    Create a FastAPI app that wraps llama-server subprocess.
-
-    This factory function creates an inference server that:
-    1. Downloads the model from HuggingFace
-    2. Starts llama-server as a subprocess
-    3. Proxies requests to the subprocess
-
-    Args:
-        config: LlamaServerConfig with model settings
-
-    Returns:
-        FastAPI application ready to run
-    """
+    """Create a FastAPI app that downloads a model, starts llama-server, and proxies requests."""
     MODEL_REPO = os.getenv("MODEL_REPO", config.default_repo)
     MODEL_FILE = os.getenv("MODEL_FILE", config.default_file)
     N_CTX = int(os.getenv("N_CTX", str(config.n_ctx)))
@@ -83,13 +67,11 @@ def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
         allow_headers=["*"],
     )
 
-    # Global state
     llama_process: Optional[subprocess.Popen] = None
     http_client: Optional[httpx.AsyncClient] = None
     log_file = None
 
     def check_llama_server():
-        """Check if llama-server binary exists and is executable"""
         llama_path = "/usr/local/bin/llama-server"
         if not os.path.exists(llama_path):
             raise RuntimeError(f"llama-server not found at {llama_path}")
@@ -106,7 +88,6 @@ def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
             logger.warning(f"Could not get llama-server version: {e}")
 
     def download_model() -> str:
-        """Download model from HuggingFace Hub"""
         cache_dir = os.getenv("HF_HOME", "/app/.cache/huggingface")
 
         logger.info(f"Downloading model: {MODEL_REPO}/{MODEL_FILE}")
@@ -122,7 +103,6 @@ def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
     LOG_PATH = "/tmp/llama-server.log"
 
     def read_server_log() -> str:
-        """Read and return the llama-server log contents."""
         if log_file:
             log_file.flush()
         try:
@@ -132,7 +112,6 @@ def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
             return "(log unavailable)"
 
     def start_llama_server(model_path: str) -> subprocess.Popen:
-        """Start the llama-server process"""
         nonlocal log_file
 
         cmd = [
@@ -194,7 +173,6 @@ def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
         raise RuntimeError(f"llama-server did not become healthy in {STARTUP_TIMEOUT}s")
 
     def cleanup():
-        """Cleanup on exit"""
         nonlocal llama_process
         if llama_process:
             logger.info("Shutting down llama-server...")
@@ -206,7 +184,6 @@ def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
 
     @app.on_event("startup")
     async def startup():
-        """Initialize the server"""
         nonlocal llama_process, http_client
 
         check_llama_server()
@@ -223,7 +200,6 @@ def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
 
     @app.on_event("shutdown")
     async def shutdown():
-        """Cleanup on shutdown"""
         nonlocal http_client
         if http_client:
             await http_client.aclose()
@@ -246,7 +222,6 @@ def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
 
     @app.get("/health/details")
     async def health_details():
-        """Detailed health info"""
         return {
             "status": "healthy",
             "model": config.display_name,
@@ -267,7 +242,6 @@ def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
 
     @app.get("/v1/models")
     async def list_models():
-        """OpenAI-compatible models endpoint"""
         return {
             "object": "list",
             "data": [
@@ -280,9 +254,16 @@ def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
             ]
         }
 
+    def validate_proxy_response(response: httpx.Response) -> dict:
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=response.text)
+        data = response.json()
+        if not isinstance(data, dict) or "choices" not in data:
+            raise HTTPException(status_code=502, detail="Invalid response from model server")
+        return data
+
     @app.post("/v1/chat/completions")
     async def chat_completions(request: Request):
-        """Proxy chat completions to llama-server"""
         body = await request.json()
         stream = body.get("stream", False)
 
@@ -294,7 +275,7 @@ def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
                     json=body,
                 ) as response:
                     if response.status_code != 200:
-                        await response.aread()  # consume body
+                        await response.aread()
                         error_event = f'data: {{"error": true, "content": "Model error: {response.status_code}"}}\n\n'
                         yield error_event.encode()
                         return
@@ -307,23 +288,12 @@ def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
             )
 
         response = await http_client.post("/v1/chat/completions", json=body)
-        if response.status_code != 200:
-            raise HTTPException(status_code=response.status_code, detail=response.text)
-        data = response.json()
-        if not isinstance(data, dict) or "choices" not in data:
-            raise HTTPException(status_code=502, detail="Invalid response from model server")
-        return data
+        return validate_proxy_response(response)
 
     @app.post("/v1/completions")
     async def completions(request: Request):
-        """Proxy completions to llama-server"""
         body = await request.json()
         response = await http_client.post("/v1/completions", json=body)
-        if response.status_code != 200:
-            raise HTTPException(status_code=response.status_code, detail=response.text)
-        data = response.json()
-        if not isinstance(data, dict) or "choices" not in data:
-            raise HTTPException(status_code=502, detail="Invalid response from model server")
-        return data
+        return validate_proxy_response(response)
 
     return app
