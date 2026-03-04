@@ -10,6 +10,7 @@ interface HeaderProps {
   setShowDock: (show: boolean) => void;
   onOpenSettings: () => void;
   gestureButtonSlot?: React.ReactNode;
+  isAuthenticated?: boolean;
 }
 
 // Icons for each mode
@@ -51,7 +52,8 @@ export default function Header({
   showDock,
   setShowDock,
   onOpenSettings,
-  gestureButtonSlot
+  gestureButtonSlot,
+  isAuthenticated,
 }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
@@ -251,8 +253,20 @@ export default function Header({
         </div>
       </div>
 
-      {/* Right: Settings */}
+      {/* Right: Admin + Settings */}
       <div className="flex items-center gap-2 w-auto justify-end pointer-events-auto z-20">
+        {isAuthenticated && (
+          <a
+            href="/admin.html"
+            className="min-w-[42px] min-h-[42px] w-[42px] h-[42px] rounded-full bg-slate-800/50 flex items-center justify-center border border-slate-700/50 hover:border-slate-600 transition-colors"
+            title="Admin"
+          >
+            <svg className="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 2a5 5 0 1 0 0 10A5 5 0 0 0 12 2z" />
+              <path d="M19 21a7 7 0 1 0-14 0" />
+            </svg>
+          </a>
+        )}
         <button
           onClick={onOpenSettings}
           className="min-w-[42px] min-h-[42px] w-[42px] h-[42px] rounded-full bg-slate-800/50 flex items-center justify-center border border-slate-700/50 hover:border-slate-600 transition-colors active:scale-95 focus:outline-none focus-visible:outline-none"

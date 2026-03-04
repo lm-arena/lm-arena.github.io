@@ -1013,6 +1013,7 @@ function PlaygroundInner() {
         showDock={showDock}
         setShowDock={setShowDock}
         onOpenSettings={() => setShowSettings(true)}
+        isAuthenticated={!!githubAuth?.token}
         gestureButtonSlot={
           <Suspense fallback={null}>
             <GestureControl
