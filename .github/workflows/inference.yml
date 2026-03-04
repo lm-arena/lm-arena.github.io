@@ -13,7 +13,9 @@ run-name: "${{ inputs.model }}"
         - functiongemma
         - gemma
         - gptoss
+        - jancode
         - lfm2
+        - lfm2thinking
         - llama
         - mistral
         - nanbeige

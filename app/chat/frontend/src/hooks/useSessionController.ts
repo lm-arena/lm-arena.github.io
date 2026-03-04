@@ -240,12 +240,14 @@ export function useSessionController(params: SessionControllerParams) {
           ? [{ role: 'system', content: systemPrompt }, ...baseMessages]
           : baseMessages;
 
+        const modelEndpoints = getModelEndpoints(modelsData);
         const response = await fetchChatStream({
           models: sessionModelIds,
           messages,
           max_tokens: GENERATION_DEFAULTS.maxTokens,
           temperature: GENERATION_DEFAULTS.temperature,
           github_token: githubToken || null,
+          modelEndpoints,
         }, currentController.signal);
 
         await streamSseEvents(response, (data) => {

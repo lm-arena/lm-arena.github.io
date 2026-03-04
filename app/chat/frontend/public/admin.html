@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    [hidden] { display: none !important; }
+
+    :root {
+      --bg:             #0d1117;
+      --surface:        #161b22;
+      --surface-raised: #1c2128;
+      --border:         #30363d;
+      --text:           #e6edf3;
+      --text-secondary: #8b949e;
+      --accent:         #1f6feb;
+      --accent-hover:   #388bfd;
+      --success:        #3fb950;
+      --danger:         #f85149;
+      --warning:        #d29922;
+      --font-mono:      'JetBrains Mono', 'Fira Mono', monospace;
+      --radius:         6px;
+      --radius-lg:      10px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      height: 52px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .header-title { font-size: 14px; font-weight: 600; }
+    .header-sub   { font-size: 12px; color: var(--text-secondary); }
+    .header-sep   { flex: 1; }
+    #user-area    { display: flex; align-items: center; gap: 10px; }
+
+    /* ── Main ── */
+    main {
+      flex: 1;
+      max-width: 760px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 48px 24px;
+    }
+
+    /* ── Sign in ── */
+    .signin-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding-top: 80px;
+      text-align: center;
+    }
+    .signin-wrap h1 { font-size: 24px; font-weight: 600; }
+    .signin-wrap p  { font-size: 13px; color: var(--text-secondary); }
+
+    .token-form {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+      max-width: 400px;
+    }
+    .token-input {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 8px 12px;
+      outline: none;
+    }
+    .token-input:focus { border-color: var(--accent); }
+    .token-input::placeholder { color: var(--text-secondary); }
+
+    .hint { font-size: 11.5px; color: var(--text-secondary); }
+    .hint a { color: var(--accent-hover); }
+    .mono { font-family: var(--font-mono); font-size: 11px;
+      background: var(--surface-raised); padding: 1px 5px; border-radius: 3px; }
+
+    /* ── Loading ── */
+    .state-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      padding-top: 80px;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+    .spinner { width: 22px; height: 22px; border: 2px solid var(--border);
+      border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Buttons ── */
+    button { font-family: inherit; cursor: pointer; border: none; border-radius: var(--radius); }
+    .btn-primary   { background: var(--accent); color: #fff; padding: 9px 20px; font-size: 13.5px; font-weight: 500; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary { background: var(--surface-raised); color: var(--text); padding: 7px 14px;
+      font-size: 12.5px; border: 1px solid var(--border); }
+    .btn-secondary:hover { border-color: var(--text-secondary); }
+    .btn-ghost  { background: transparent; color: var(--text-secondary); padding: 5px 10px; font-size: 12px;
+      border: 1px solid var(--border); }
+    .btn-ghost:hover  { color: var(--text); border-color: var(--text-secondary); }
+    .btn-danger { background: transparent; color: var(--danger); padding: 5px 12px; font-size: 12px;
+      border: 1px solid var(--danger); }
+    .btn-danger:hover  { background: rgba(248,81,73,.08); }
+    .btn-success { background: transparent; color: var(--success); padding: 5px 12px; font-size: 12px;
+      border: 1px solid var(--success); }
+    .btn-success:hover { background: rgba(63,185,80,.08); }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* ── Controls bar ── */
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .controls-left  { display: flex; align-items: center; gap: 10px; }
+    .controls-right { display: flex; align-items: center; gap: 8px; }
+    .controls h2 { font-size: 15px; font-weight: 600; }
+    .run-count   { font-size: 12px; color: var(--text-secondary); }
+
+    /* ── Model list ── */
+    .model-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .model-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .model-card.running { border-color: rgba(63,185,80,.3); }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: var(--border);
+    }
+    .status-dot.running  { background: var(--success); box-shadow: 0 0 6px rgba(63,185,80,.5); }
+    .status-dot.starting { background: var(--warning); animation: pulse 1.2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+    .model-info  { flex: 1; min-width: 0; }
+    .model-name  { font-size: 13.5px; font-weight: 500; }
+    .model-key   { font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+
+    .model-status         { font-size: 11.5px; color: var(--text-secondary); margin-right: 4px; }
+    .model-status.running { color: var(--success); }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 14px 24px;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      display: flex;
+      gap: 16px;
+    }
+    footer a { color: var(--text-secondary); }
+    footer a:hover { color: var(--text); }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 20px; right: 20px;
+      padding: 10px 16px; border-radius: 6px;
+      font-size: 13px; z-index: 999; color: #e6edf3;
+    }
+    .toast-error { background: #3d1c1c; border: 1px solid var(--danger); }
+    .toast-info  { background: #1c3d2d; border: 1px solid var(--success); }
+  </style>
+</head>
+<body>
+
+<header id="header" hidden>
+  <span class="header-title">lm-arena</span>
+  <span class="header-sub">/ admin</span>
+  <div class="header-sep"></div>
+  <div id="user-area"></div>
+</header>
+
+<main id="main"></main>
+
+<footer id="footer" hidden>
+  <a href="https://github.com/jonasneves/lm-arena" target="_blank">jonasneves/lm-arena</a>
+  <a href="https://github.com/jonasneves/lm-arena/actions" target="_blank">actions</a>
+</footer>
+
+<script>
+  const REPO     = 'jonasneves/lm-arena';
+  const API      = 'https://api.github.com';
+  const AUTH_KEY = 'lm-arena-admin-token';
+
+  const MODELS = [
+    { key: 'nanbeige',      name: 'Nanbeige4.1-3B' },
+    { key: 'dasd',          name: 'DASD-4B Thinking' },
+    { key: 'qwen',          name: 'Qwen3 4B' },
+    { key: 'smollm3',       name: 'SmolLM3 3B' },
+    { key: 'agentcpm',      name: 'AgentCPM-Explore 4B' },
+    { key: 'lfm2',          name: 'LFM2.5 1.2B' },
+    { key: 'lfm2thinking',  name: 'LFM2.5 1.2B Thinking' },
+    { key: 'r1qwen',        name: 'DeepSeek R1 1.5B' },
+    { key: 'gemma',         name: 'Gemma 3 12B' },
+    { key: 'mistral',       name: 'Mistral 7B v0.3' },
+    { key: 'jancode',       name: 'Jan-code 4B' },
+    { key: 'phi',           name: 'Phi-4 Mini' },
+    { key: 'rnj',           name: 'RNJ-1 Instruct' },
+    { key: 'llama',         name: 'Llama 3.2 3B' },
+    { key: 'functiongemma', name: 'FunctionGemma 270M' },
+    { key: 'gptoss',        name: 'GPT-OSS 20B' },
+  ];
+
+  const $main   = document.getElementById('main');
+  const $header = document.getElementById('header');
+  const $footer = document.getElementById('footer');
+  const $uarea  = document.getElementById('user-area');
+
+  let token    = null;
+  let runMap   = {};    // model key → run id
+  let pending  = new Set();
+  let pollTimer = null;
+
+  function setChrome(visible) {
+    $header.hidden = !visible;
+    $footer.hidden = !visible;
+    document.title = visible ? 'lm-arena — Admin' : 'Admin';
+    if (!visible) $uarea.innerHTML = '';
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────
+
+  function init() {
+    token = localStorage.getItem(AUTH_KEY);
+    if (token) {
+      setChrome(true);
+      $uarea.innerHTML = `<button class="btn-ghost" onclick="signOut()">Sign out</button>`;
+      loadRuns();
+    } else {
+      renderSignIn();
+    }
+  }
+
+  // ── Auth ──────────────────────────────────────────────────────────────
+
+  function signIn() {
+    const val = document.getElementById('token-input').value.trim();
+    if (!val) return;
+    token = val;
+    localStorage.setItem(AUTH_KEY, token);
+    setChrome(true);
+    $uarea.innerHTML = `<button class="btn-ghost" onclick="signOut()">Sign out</button>`;
+    loadRuns();
+  }
+
+  function signOut() {
+    localStorage.removeItem(AUTH_KEY);
+    token = null;
+    runMap = {};
+    pending.clear();
+    clearInterval(pollTimer);
+    setChrome(false);
+    renderSignIn();
+  }
+
+  // ── API ───────────────────────────────────────────────────────────────
+
+  async function ghFetch(path, opts = {}) {
+    const res = await fetch(`${API}${path}`, {
+      ...opts,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+        ...opts.headers,
+      },
+    });
+    if (res.status === 401) { signOut(); throw new Error('Unauthorized'); }
+    return res;
+  }
+
+  async function fetchRuns() {
+    const res = await ghFetch(
+      `/repos/${REPO}/actions/workflows/inference.yml/runs?status=in_progress&per_page=100`
+    );
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const map = {};
+    for (const run of data.workflow_runs) {
+      // run-name is set to the model key in inference.yml
+      map[run.display_title] = run.id;
+    }
+    return map;
+  }
+
+  async function loadRuns() {
+    renderLoading('Loading…');
+    try {
+      runMap = await fetchRuns();
+      renderModels();
+      schedulePoll();
+    } catch (e) {
+      if (e.message !== 'Unauthorized')
+        showToast('Failed to load runs: ' + e.message, 'error');
+    }
+  }
+
+  async function refreshRuns() {
+    try {
+      runMap = await fetchRuns();
+      renderModels();
+    } catch {}
+  }
+
+  async function startModel(key) {
+    pending.add(key);
+    renderModels();
+    try {
+      const res = await ghFetch(
+        `/repos/${REPO}/actions/workflows/inference.yml/dispatches`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ref: 'main', inputs: { model: key } }),
+        }
+      );
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      showToast(`Started ${key}`);
+      setTimeout(refreshRuns, 4000);
+      setTimeout(refreshRuns, 10000);
+    } catch (e) {
+      if (e.message !== 'Unauthorized')
+        showToast(`Failed to start ${key}: ` + e.message, 'error');
+    } finally {
+      pending.delete(key);
+      renderModels();
+    }
+  }
+
+  async function stopModel(key) {
+    const runId = runMap[key];
+    if (!runId) return;
+    pending.add(key);
+    renderModels();
+    try {
+      const res = await ghFetch(`/repos/${REPO}/actions/runs/${runId}/cancel`, { method: 'POST' });
+      if (!res.ok && res.status !== 409) throw new Error('HTTP ' + res.status);
+      delete runMap[key];
+      showToast(`Stopped ${key}`);
+    } catch (e) {
+      if (e.message !== 'Unauthorized')
+        showToast(`Failed to stop ${key}: ` + e.message, 'error');
+    } finally {
+      pending.delete(key);
+      renderModels();
+    }
+  }
+
+  async function startAll() {
+    for (const m of MODELS) {
+      if (!runMap[m.key] && !pending.has(m.key)) {
+        await startModel(m.key);
+        await new Promise(r => setTimeout(r, 400));
+      }
+    }
+  }
+
+  async function stopAll() {
+    await Promise.all(
+      MODELS.filter(m => runMap[m.key]).map(m => stopModel(m.key))
+    );
+  }
+
+  function schedulePoll() {
+    clearInterval(pollTimer);
+    pollTimer = setInterval(refreshRuns, 30000);
+  }
+
+  // ── Render ────────────────────────────────────────────────────────────
+
+  function renderSignIn() {
+    $main.innerHTML = `
+      <div class="signin-wrap">
+        <div>
+          <h1>lm-arena admin</h1>
+          <p style="margin-top:8px">GitHub PAT with <span class="mono">workflow</span> scope</p>
+        </div>
+        <div class="token-form">
+          <input id="token-input" class="token-input" type="password" placeholder="ghp_…"
+            onkeydown="if(event.key==='Enter')signIn()">
+          <button class="btn-primary" onclick="signIn()">Sign in</button>
+        </div>
+        <span class="hint">
+          <a href="https://github.com/settings/tokens/new?scopes=workflow" target="_blank">Create token</a>
+        </span>
+      </div>`;
+    document.getElementById('token-input').focus();
+  }
+
+  function renderLoading(msg) {
+    $main.innerHTML = `
+      <div class="state-wrap">
+        <div class="spinner"></div>
+        <p>${msg}</p>
+      </div>`;
+  }
+
+  function renderModels() {
+    const runningCount = MODELS.filter(m => runMap[m.key]).length;
+
+    const cards = MODELS.map(m => {
+      const isRunning = !!runMap[m.key];
+      const isPending = pending.has(m.key);
+      const dotClass  = isPending ? 'starting' : isRunning ? 'running' : '';
+      const statusText = isPending ? 'pending…' : isRunning ? 'running' : '';
+
+      let btn;
+      if (isPending) {
+        btn = `<button class="btn-ghost" disabled>…</button>`;
+      } else if (isRunning) {
+        btn = `<button class="btn-danger" onclick="stopModel('${m.key}')">Stop</button>`;
+      } else {
+        btn = `<button class="btn-success" onclick="startModel('${m.key}')">Start</button>`;
+      }
+
+      return `
+        <div class="model-card${isRunning ? ' running' : ''}">
+          <div class="status-dot ${dotClass}"></div>
+          <div class="model-info">
+            <div class="model-name">${m.name}</div>
+            <div class="model-key">${m.key}</div>
+          </div>
+          <span class="model-status${isRunning ? ' running' : ''}">${statusText}</span>
+          ${btn}
+        </div>`;
+    }).join('');
+
+    $main.innerHTML = `
+      <div class="controls">
+        <div class="controls-left">
+          <h2>Models</h2>
+          <span class="run-count">${runningCount} / ${MODELS.length} running</span>
+        </div>
+        <div class="controls-right">
+          <button class="btn-secondary" onclick="refreshRuns()">Refresh</button>
+          <button class="btn-secondary" onclick="stopAll()">Stop all</button>
+          <button class="btn-primary" onclick="startAll()">Start all</button>
+        </div>
+      </div>
+      <div class="model-list">${cards}</div>`;
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────
+
+  function showToast(msg, type = 'info') {
+    const el = document.createElement('div');
+    el.className = `toast ${type === 'error' ? 'toast-error' : 'toast-info'}`;
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }
+
+  init();
+</script>
+</body>
+</html>
