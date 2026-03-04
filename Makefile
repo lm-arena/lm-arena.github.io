@@ -54,8 +54,8 @@ _purge-inference-history:
 		done
 
 inference: _purge-inference-history
-	@[ -n "$(MODEL)" ] || { echo "Usage: make inference MODEL=<name> [HOURS=5]"; exit 1; }
-	gh workflow run inference.yml -f model=$(MODEL) -f duration_hours=$(or $(HOURS),5)
+	@[ -n "$(MODEL)" ] || { echo "Usage: make inference MODEL=<name>"; exit 1; }
+	gh workflow run inference.yml -f model=$(MODEL)
 
 deploy:
 	gh workflow run deploy.yml
@@ -66,7 +66,7 @@ build-images:
 up: _purge-inference-history
 	@for model in $$(python3 config/models.py --inference-names | jq -r '.[]'); do \
 		printf "\033[36mStarting $$model...\033[0m\n"; \
-		gh workflow run inference.yml -f model=$$model -f duration_hours=$(or $(HOURS),5); \
+		gh workflow run inference.yml -f model=$$model; \
 	done
 
 down:
