@@ -15,7 +15,7 @@ npm run type-check
 npm run build
 ```
 
-The dev server calls inference servers directly at their `cfargotunnel.com` URLs in production, and at `localhost:<port>` when running locally.
+The dev server calls inference servers at `localhost:<port>` when running locally. In production, active tunnel URLs are fetched from the tunnel-registry Worker at startup.
 
 ## Features
 

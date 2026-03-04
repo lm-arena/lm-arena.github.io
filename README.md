@@ -1,13 +1,12 @@
-# Serverless LLM
+# LM Arena
 
-Self-hosted LLM inference using GitHub Actions as compute. Each model runs in a Docker container on a GitHub Actions runner, exposed via Cloudflare Tunnel. Frontend is a static React app on GitHub Pages.
+Self-hosted LLM inference using GitHub Actions as compute. Each model runs in a Docker container on a GitHub Actions runner, exposed via Cloudflare quick tunnel. Frontend is a static React app on GitHub Pages.
 
 ## Models
 
 | Rank | Model | Size | Key Benchmarks | Best For |
 |:-----|:------|:-----|:---------------|:---------|
 | 1 | **Nanbeige4-3B Thinking** | 3B | AIME 90.4%, GPQA-Diamond 82.2% | Complex reasoning, math, competitive programming |
-| 2 | **GLM-4.7 Flash** | 30B MoE (3B active) | AIME 91.6%, SWE-bench 59.2% | Reasoning, code, function calling |
 | 2 | **DASD-4B Thinking** | 4B | Thinking-mode reasoning | Step-by-step reasoning, problem solving |
 | 2 | **Qwen3-4B** | 4B | MMLU-Pro 69.6%, GPQA 62.0%, 262K context | Multilingual (119 langs), long-context, agents |
 | 3 | **SmolLM3 3B** | 3B | AIME 36.7%, BFCL 92.3%, 64K context | Tool-calling, reasoning, multilingual |
@@ -27,62 +26,37 @@ Self-hosted LLM inference using GitHub Actions as compute. Each model runs in a 
 ```
 GitHub Actions runner
   └── Docker: inference server (llama-cpp-python or llama-server)
-        └── cloudflared tunnel → <uuid>.cfargotunnel.com
+        └── cloudflared quick tunnel → <random>.trycloudflare.com
+              └── registered in tunnel-registry Worker
 
 GitHub Pages (static frontend)
-  └── fetches models list from llm-api Worker
-  └── streams chat directly to inference tunnel URLs
+  └── fetches active tunnel URLs from tunnel-registry Worker
+  └── streams chat directly to inference servers
 ```
 
-- **Inference**: each `make inference MODEL=<name>` triggers a workflow run on `ubuntu-24.04-arm`. The runner downloads the model from Hugging Face, starts the server, and connects via Cloudflare Tunnel.
+- **Inference**: each `make inference MODEL=<name>` triggers a workflow on `ubuntu-24.04-arm`. The runner downloads the model from Hugging Face, starts the server, opens a Cloudflare quick tunnel, and registers its URL with the tunnel-registry Worker.
 - **Frontend**: static Vite + React app. No backend — calls inference servers and GitHub Models API directly.
-- **Tunnel tokens**: stored as a single `TUNNELS_JSON` GitHub secret (`make tunnels-secret` to refresh).
+- **Tunnel registry**: a Cloudflare Worker at `tunnel-registry.jonasneves.workers.dev` maps model names to their currently-active tunnel URLs.
 
 ## Project Structure
 
 ```
 ├── .github/workflows/
-│   ├── inference.yml                       # Dispatch: reads config, calls reusable workflow
-│   ├── reusable-inference-containerized.yml  # Core: pull image, run server, start tunnel, monitor
-│   ├── build-push-images.yml               # Build and push Docker images to GHCR
-│   └── deploy.yml                          # Deploy frontend to GitHub Pages
+│   ├── inference.yml                          # Dispatch: reads config, calls reusable workflow
+│   ├── reusable-inference-containerized.yml   # Core: pull image, run server, start tunnel, monitor
+│   ├── build-push-images.yml                  # Build and push Docker images to GHCR
+│   └── deploy.yml                             # Deploy frontend to GitHub Pages
 ├── app/
-│   ├── shared/                             # Dockerfile.inference, Dockerfile.llama-server, inference_server.py
-│   ├── lfm2-inference/                     # LFM2 inference_server.py (llama-server)
-│   ├── rnj-inference/                      # RNJ inference_server.py (llama-server, pinned commit)
-│   └── chat/frontend/                      # Vite + React frontend
+│   ├── shared/                                # Shared Dockerfiles and Python inference code
+│   ├── <model>-inference/                     # Per-model inference_server.py
+│   ├── tunnel-registry/                       # Cloudflare Worker: active tunnel URL registry
+│   └── chat/frontend/                         # Vite + React frontend
 ├── config/
-│   └── models.py                           # Single source of truth: ports, tunnel IDs, HF repos, inference settings
+│   └── models.py                              # Single source of truth: ports, HF repos, inference settings
 ├── scripts/
-│   ├── tunnels_secret.py                   # Collect tunnel tokens → TUNNELS_JSON secret
-│   ├── get_tunnel_token.py                 # Read token for a model (used by inference workflow)
-│   └── update_github_models.py             # Refresh GitHub Models catalog
-├── docker-compose.yml                      # Local development
-└── tunnels.json                            # {model: token} map (gitignored)
-```
-
-## Make Commands
-
-```
-Frontend
-  build           Build frontend
-  deploy          Trigger deploy workflow
-
-Code
-  lint            Check Python code
-  format          Format Python code
-  update-models   Refresh GitHub models in models.json
-  clean           Remove caches
-
-Inference (GitHub Actions)
-  inference       Run MODEL=<name> [HOURS=5]
-  build-images    Build Docker images [MODELS=all] [NO_CACHE=false]
-  up              Launch all inference models [HOURS=5]
-  down            Cancel all in-progress workflow runs
-
-Tunnels
-  tunnels-secret  Collect tokens and set TUNNELS_JSON secret
-  tunnels-list    List models and ports
+│   ├── generate_extension_config.py           # Regenerate frontend JSON configs from models.py
+│   └── update_github_models.py                # Refresh GitHub Models catalog
+└── docker-compose.yml                         # Local development
 ```
 
 ## Local Development
@@ -106,7 +80,6 @@ All model settings live in `config/models.py`:
 
 | Field | Description |
 |-------|-------------|
-| `tunnel_id` | Cloudflare Tunnel UUID → `<id>.cfargotunnel.com` |
 | `hf_repo` / `hf_file` | Hugging Face GGUF source |
 | `n_ctx` | Context window (default: 4096) |
 | `n_threads` | CPU threads (default: 4) |
@@ -124,7 +97,7 @@ Each inference server exposes an OpenAI-compatible API:
 | `POST /v1/chat/completions` | Chat completion (streaming supported) |
 
 ```bash
-curl -X POST https://<tunnel-id>.cfargotunnel.com/v1/chat/completions \
+curl -X POST https://<random>.trycloudflare.com/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
     "messages": [{"role": "user", "content": "Hello"}],
