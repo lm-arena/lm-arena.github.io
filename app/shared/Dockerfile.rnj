@@ -1,0 +1,55 @@
+FROM python:3.11-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    git \
+    pkg-config \
+    libopenblas-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+
+# rnj1 architecture support only exists in the Essential-AI fork at this commit.
+# It was never merged into ggml-org/llama.cpp master.
+RUN git clone https://github.com/Essential-AI/llama.cpp.git . \
+    && git checkout e1b7d46e8c3364cad6d3d17059e9748911726881 \
+    && git submodule update --init --recursive \
+    && cmake -B build \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DGGML_BLAS=ON \
+        -DGGML_BLAS_VENDOR=OpenBLAS \
+        -DGGML_NATIVE=ON \
+        -DLLAMA_BUILD_SERVER=ON \
+    && cmake --build build -j$(nproc) \
+    && (cp build/bin/llama-server /usr/local/bin/ 2>/dev/null || \
+        find build -name "llama-server" -type f -exec cp {} /usr/local/bin/ \;) \
+    && chmod +x /usr/local/bin/llama-server \
+    && find build -name "*.so*" -exec cp -v {} /usr/local/lib/ \; || true \
+    && ldconfig \
+    && rm -rf /build
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    libopenblas0-pthread \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY app/shared/ ./shared/
+COPY app/shared/requirements-llama-server.txt requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+COPY app/rnj-inference/inference_server.py .
+
+ENV PORT=8000
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=180s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+CMD ["python3", "inference_server.py"]

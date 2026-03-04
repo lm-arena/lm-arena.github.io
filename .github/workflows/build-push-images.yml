@@ -126,11 +126,13 @@ jobs:
       - name: Compute build config
         id: config
         run: |
-          LLAMA_SERVER_MODELS="rnj-inference lfm2-inference"
+          LLAMA_SERVER_MODELS="lfm2-inference"
           MODEL="${{ matrix.model }}"
-          LLAMA_COMMIT=""
-
-          if echo "$LLAMA_SERVER_MODELS" | grep -qw "$MODEL"; then
+          if [ "$MODEL" = "rnj-inference" ]; then
+            DOCKERFILE="./app/shared/Dockerfile.rnj"
+            CONTEXT="."
+            BUILD_ARGS=""
+          elif echo "$LLAMA_SERVER_MODELS" | grep -qw "$MODEL"; then
             DOCKERFILE="./app/shared/Dockerfile.llama-server"
             CONTEXT="."
             BUILD_ARGS="MODEL_DIR=$MODEL"
@@ -151,16 +153,7 @@ jobs:
           echo "scope=$MODEL-$HASH" >> $GITHUB_OUTPUT
           echo "Using Dockerfile: $DOCKERFILE (scope: $MODEL-$HASH)"
 
-          if [ -n "$LLAMA_COMMIT" ]; then
-            {
-              echo 'build_args<<EOF'
-              echo "$BUILD_ARGS"
-              echo "LLAMA_COMMIT=$LLAMA_COMMIT"
-              echo 'EOF'
-            } >> $GITHUB_OUTPUT
-          else
-            echo "build_args=$BUILD_ARGS" >> $GITHUB_OUTPUT
-          fi
+          echo "build_args=$BUILD_ARGS" >> $GITHUB_OUTPUT
 
       - name: Build and push
         uses: docker/build-push-action@v5
