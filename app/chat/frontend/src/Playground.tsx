@@ -6,7 +6,6 @@ import PromptInput from './components/PromptInput';
 import Header from './components/Header';
 import { useModelsManager } from './hooks/useModelsManager';
 import { usePersistedSetting } from './hooks/usePersistedSetting';
-import { useExtensionConfig } from './hooks/useExtensionConfig';
 import { useConversationHistory } from './hooks/useConversationHistory';
 import { useStreamAccumulator } from './hooks/useStreamAccumulator';
 import { useSessionController } from './hooks/useSessionController';
@@ -38,9 +37,6 @@ const SMART_DEFAULT_LIMITS: Record<string, number> = { compare: Infinity, analyz
 
 function PlaygroundInner() {
   const gestureCtx = useGesture();
-
-  // Configures the apiClient with user's saved settings on startup
-  useExtensionConfig();
 
   const {
     modelsData,

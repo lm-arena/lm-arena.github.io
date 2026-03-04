@@ -28,7 +28,6 @@ help:
 	@echo ""
 
 build:
-	@python3 scripts/generate_extension_config.py
 	cd app/chat/frontend && npm install && npm run build
 
 lint:

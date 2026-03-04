@@ -2,7 +2,9 @@ import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { Model } from '../types';
 import { MODEL_META } from '../constants';
 import { usePersistedSetting } from './usePersistedSetting';
-import { SERVICES } from './useExtensionConfig';
+import servicesConfig from '../data/services.json';
+
+const SERVICES = servicesConfig.services as { key: string; modelId: string; localPort: number }[];
 
 interface ModelsApiModel {
   id: string;
