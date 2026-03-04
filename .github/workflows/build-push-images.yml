@@ -126,13 +126,9 @@ jobs:
       - name: Compute build config
         id: config
         run: |
-          LLAMA_SERVER_MODELS="lfm2-inference"
+          LLAMA_SERVER_MODELS="rnj-inference lfm2-inference"
           MODEL="${{ matrix.model }}"
-          if [ "$MODEL" = "rnj-inference" ]; then
-            DOCKERFILE="./app/shared/Dockerfile.rnj"
-            CONTEXT="."
-            BUILD_ARGS=""
-          elif echo "$LLAMA_SERVER_MODELS" | grep -qw "$MODEL"; then
+          if echo "$LLAMA_SERVER_MODELS" | grep -qw "$MODEL"; then
             DOCKERFILE="./app/shared/Dockerfile.llama-server"
             CONTEXT="."
             BUILD_ARGS="MODEL_DIR=$MODEL"
