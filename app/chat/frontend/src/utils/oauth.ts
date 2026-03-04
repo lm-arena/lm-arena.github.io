@@ -8,7 +8,7 @@ export interface GitHubAuth {
 }
 
 export async function connectGitHub(): Promise<GitHubAuth> {
-  const state = crypto.randomUUID() + '|serverless-llm';
+  const state = crypto.randomUUID() + '|lm-arena';
   const redirectUri = `${OAUTH_CALLBACK_ORIGIN}/auth/`;
 
   const authUrl = new URL('https://github.com/login/oauth/authorize');
