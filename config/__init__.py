@@ -1,4 +1,4 @@
-# Config package for serverless-llm
+# Config package for lm-arena
 from config.models import (
     MODELS,
     ModelCategory,

@@ -1,5 +1,5 @@
 """
-Centralized model configuration for serverless-llm.
+Centralized model configuration for lm-arena.
 
 This is the SINGLE SOURCE OF TRUTH for:
 - Port mappings
