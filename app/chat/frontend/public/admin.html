@@ -457,42 +457,15 @@
   }
 
   async function purgeStale() {
-    if (!writeKey) {
-      showToast('Set the tunnel write key first', 'error');
-      return;
+    try {
+      const res = await fetch(`${REGISTRY}/purge`, { method: 'POST' });
+      const { purged } = await res.json();
+      if (!purged.length) { showToast('All tunnels are healthy'); return; }
+      showToast(`Purged ${purged.length} stale: ${purged.join(', ')}`);
+      await refreshStatus();
+    } catch (e) {
+      showToast('Purge failed: ' + e.message, 'error');
     }
-    const current = await fetchTunnels().catch(() => ({}));
-    const entries = Object.entries(current);
-    if (!entries.length) { showToast('No tunnels registered'); return; }
-
-    // Probe each tunnel — no-cors so CORS headers don't matter;
-    // resolves (opaque) if server responds, rejects if unreachable.
-    const alive = await Promise.all(
-      entries.map(async ([model, url]) => {
-        try {
-          await fetch(`${url}/health`, {
-            mode: 'no-cors',
-            signal: AbortSignal.timeout(5000),
-          });
-          return { model, dead: false };
-        } catch {
-          return { model, dead: true };
-        }
-      })
-    );
-
-    const dead = alive.filter(x => x.dead);
-    if (!dead.length) { showToast('All tunnels are healthy'); return; }
-
-    await Promise.all(dead.map(({ model }) =>
-      fetch(`${REGISTRY}/tunnel/${model}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${writeKey}` },
-      })
-    ));
-
-    showToast(`Purged ${dead.length} stale tunnel${dead.length > 1 ? 's' : ''}: ${dead.map(x => x.model).join(', ')}`);
-    await refreshStatus();
   }
 
   function schedulePoll() {

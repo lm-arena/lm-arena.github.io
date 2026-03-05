@@ -56,6 +56,29 @@ async function handleTunnelDelete(request, env, model) {
   return jsonResponse({ ok: true, model });
 }
 
+async function handlePurge(env) {
+  const list = await env.TUNNELS_KV.list({ prefix: 'tunnel:' });
+  const purged = [];
+
+  await Promise.all(list.keys.map(async ({ name }) => {
+    const model = name.slice('tunnel:'.length);
+    const url = await env.TUNNELS_KV.get(name);
+    if (!url) return;
+    try {
+      const res = await fetch(`${url}/health`, { signal: AbortSignal.timeout(5000) });
+      if (!res.ok) throw new Error('unhealthy');
+    } catch {
+      await Promise.all([
+        env.TUNNELS_KV.delete(`tunnel:${model}`),
+        env.TUNNELS_KV.delete(`signal:${model}`),
+      ]);
+      purged.push(model);
+    }
+  }));
+
+  return jsonResponse({ ok: true, purged });
+}
+
 async function handleSignalPut(request, env, model) {
   if (!isAuthorized(request, env)) return jsonResponse({ error: 'unauthorized' }, 401);
   const body = await request.json();
@@ -82,8 +105,12 @@ export default {
       return handleTunnelsGet(env);
     }
 
-    if (pathname === '/health') {
+    if (pathname === '/health' && method === 'GET') {
       return new Response('ok');
+    }
+
+    if (pathname === '/purge' && method === 'POST') {
+      return handlePurge(env);
     }
 
     const tunnelMatch = pathname.match(/^\/tunnel\/([^/]+)$/);
