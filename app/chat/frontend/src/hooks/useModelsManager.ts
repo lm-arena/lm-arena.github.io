@@ -136,13 +136,13 @@ export function useModelsManager() {
   }, [loadModels]);
 
   const availableModels = useMemo(
-    () => modelsData.filter(m => !selected.includes(m.id)),
+    () => modelsData.filter(m => m.id !== 'auto' && !selected.includes(m.id)),
     [modelsData, selected],
   );
 
   const { totalModelsByType, allSelectedByType } = useMemo(() => {
     const total = {
-      'self-hosted': modelsData.filter(m => m.type === 'self-hosted').length,
+      'self-hosted': modelsData.filter(m => m.id !== 'auto' && m.type === 'self-hosted').length,
       github: modelsData.filter(m => m.type === 'github').length,
     };
     const selectedCount = {

@@ -162,8 +162,12 @@ function PlaygroundInner() {
       const set = new Set(prev);
       if (set.has(modelId)) {
         set.delete(modelId);
+      } else if (modelId === 'auto') {
+        // Auto is mutually exclusive
+        return ['auto'];
       } else {
-        // Clear models from the other group
+        // Selecting any model clears Auto and models from the other group
+        set.delete('auto');
         const otherType = model.type === 'self-hosted' ? 'github' : 'self-hosted';
         modelsData.filter(m => m.type === otherType).forEach(m => set.delete(m.id));
         set.add(modelId);
@@ -185,7 +189,8 @@ function PlaygroundInner() {
       if (allSelected) {
         idsOfType.forEach(id => set.delete(id));
       } else {
-        // Clear models from the other group
+        // Clear Auto and models from the other group
+        set.delete('auto');
         idsOfOtherType.forEach(id => set.delete(id));
         idsOfType.forEach(id => set.add(id));
       }
