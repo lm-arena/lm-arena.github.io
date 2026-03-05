@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>lm-arena — Benchmarks</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:             #0d1117;
+      --surface:        #161b22;
+      --surface-raised: #1c2128;
+      --border:         #30363d;
+      --text:           #e6edf3;
+      --text-secondary: #8b949e;
+      --accent:         #1f6feb;
+      --success:        #3fb950;
+      --warning:        #d29922;
+      --danger:         #f85149;
+      --font-mono:      'JetBrains Mono', 'Fira Mono', monospace;
+      --radius:         6px;
+      --radius-lg:      10px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      height: 52px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .header-title { font-size: 14px; font-weight: 600; }
+    .header-sub   { font-size: 12px; color: var(--text-secondary); }
+    .header-sep   { flex: 1; }
+    .header-nav a {
+      font-size: 12px; color: var(--text-secondary);
+      text-decoration: none; margin-left: 16px;
+    }
+    .header-nav a:hover { color: var(--text); }
+
+    main {
+      flex: 1;
+      max-width: 960px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 48px 24px;
+    }
+
+    h1 { font-size: 20px; font-weight: 600; margin-bottom: 6px; }
+    .subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 32px; }
+
+    .state-wrap {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 14px; padding-top: 80px; color: var(--text-secondary);
+    }
+    .spinner { width: 22px; height: 22px; border: 2px solid var(--border);
+      border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      text-align: left; padding: 8px 12px;
+      font-size: 11px; font-weight: 600; color: var(--text-secondary);
+      text-transform: uppercase; letter-spacing: .04em;
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody td { padding: 10px 12px; }
+    tbody tr:hover { background: var(--surface-raised); }
+
+    .model-id { font-family: var(--font-mono); font-size: 12px; }
+    .val      { font-family: var(--font-mono); font-size: 12.5px; }
+    .na       { color: var(--text-secondary); }
+
+    .bar-cell { min-width: 120px; }
+    .bar-bg   { background: var(--surface-raised); border-radius: 3px; height: 6px; }
+    .bar-fill { height: 6px; border-radius: 3px; background: var(--accent); }
+
+    .suite-tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+    .tab {
+      padding: 5px 14px; border-radius: var(--radius);
+      font-size: 12.5px; cursor: pointer;
+      background: var(--surface); border: 1px solid var(--border); color: var(--text-secondary);
+    }
+    .tab:hover { border-color: var(--text-secondary); color: var(--text); }
+    .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    .date-note { font-size: 11.5px; color: var(--text-secondary); margin-bottom: 20px; }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 14px 24px; font-size: 11.5px; color: var(--text-secondary);
+      display: flex; gap: 16px;
+    }
+    footer a { color: var(--text-secondary); }
+    footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="header-title">lm-arena</span>
+  <span class="header-sub">/ benchmarks</span>
+  <div class="header-sep"></div>
+  <nav class="header-nav">
+    <a href="/">Chat</a>
+    <a href="/admin.html">Admin</a>
+  </nav>
+</header>
+
+<main id="main">
+  <div class="state-wrap">
+    <div class="spinner"></div>
+    <p>Loading benchmark results…</p>
+  </div>
+</main>
+
+<footer>
+  <a href="https://github.com/jonasneves/lm-arena" target="_blank">jonasneves/lm-arena</a>
+  <a href="https://github.com/jonasneves/lm-arena/actions/workflows/benchmark.yml" target="_blank">benchmark runs</a>
+</footer>
+
+<script>
+  const REGISTRY = 'https://tunnel-registry.jonasneves.workers.dev';
+  const SUITES = ['overall', 'mmlu', 'humaneval', 'gsm8k'];
+  let data = {};
+  let activeSuite = 'overall';
+
+  const $main = document.getElementById('main');
+
+  async function load() {
+    try {
+      const res = await fetch(`${REGISTRY}/benchmarks`);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      data = await res.json();
+      render();
+    } catch (e) {
+      $main.innerHTML = `<div class="state-wrap"><p>Failed to load: ${e.message}</p></div>`;
+    }
+  }
+
+  function setTab(suite) {
+    activeSuite = suite;
+    render();
+  }
+
+  function fmt(v) {
+    if (v == null) return '<span class="na">—</span>';
+    return `<span class="val">${v}</span>`;
+  }
+
+  function render() {
+    const models = Object.values(data);
+    if (models.length === 0) {
+      $main.innerHTML = `
+        <h1>Benchmarks</h1>
+        <p class="subtitle">No results yet. Trigger the <a href="https://github.com/jonasneves/lm-arena/actions/workflows/benchmark.yml" style="color:var(--accent)">benchmark workflow</a> to generate results.</p>`;
+      return;
+    }
+
+    // Sort by overall p50 latency (ascending)
+    const sorted = [...models].sort((a, b) => {
+      const ap = a.overall?.p50_ms ?? Infinity;
+      const bp = b.overall?.p50_ms ?? Infinity;
+      return ap - bp;
+    });
+
+    const sampleDate = models[0]?.date || '';
+    const tabs = SUITES.map(s => `<button class="tab${s === activeSuite ? ' active' : ''}" onclick="setTab('${s}')">${s}</button>`).join('');
+
+    let thead, rows;
+
+    if (activeSuite === 'overall') {
+      const maxTps = Math.max(...sorted.map(m => m.overall?.avg_tokens_per_sec ?? 0));
+      thead = `<tr>
+        <th>Model</th>
+        <th>P50 latency</th>
+        <th>P95 latency</th>
+        <th>Tokens/sec</th>
+        <th class="bar-cell">Speed</th>
+      </tr>`;
+      rows = sorted.map(m => {
+        const o = m.overall || {};
+        const tps = o.avg_tokens_per_sec ?? 0;
+        const pct = maxTps > 0 ? Math.round((tps / maxTps) * 100) : 0;
+        return `<tr>
+          <td class="model-id">${m.model}</td>
+          <td>${o.p50_ms != null ? fmt(o.p50_ms + ' ms') : fmt(null)}</td>
+          <td>${o.p95_ms != null ? fmt(o.p95_ms + ' ms') : fmt(null)}</td>
+          <td>${o.avg_tokens_per_sec != null ? fmt(o.avg_tokens_per_sec + ' t/s') : fmt(null)}</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div></td>
+        </tr>`;
+      }).join('');
+    } else {
+      const maxAcc = 1;
+      thead = `<tr>
+        <th>Model</th>
+        <th>Accuracy</th>
+        <th>Answered</th>
+        <th>P50 latency</th>
+        <th class="bar-cell">Accuracy</th>
+      </tr>`;
+      rows = sorted.map(m => {
+        const s = m.suites?.[activeSuite] || {};
+        const acc = s.accuracy ?? null;
+        const pct = acc != null ? Math.round(acc * 100) : 0;
+        return `<tr>
+          <td class="model-id">${m.model}</td>
+          <td>${acc != null ? fmt((acc * 100).toFixed(0) + '%') : fmt(null)}</td>
+          <td>${s.answered != null ? fmt(`${s.answered}/${s.prompts}`) : fmt(null)}</td>
+          <td>${s.p50_ms != null ? fmt(s.p50_ms + ' ms') : fmt(null)}</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div></td>
+        </tr>`;
+      }).join('');
+    }
+
+    $main.innerHTML = `
+      <h1>Benchmarks</h1>
+      <p class="subtitle">Daily evaluation across MMLU, HumanEval, and GSM8K prompt suites.</p>
+      <div class="suite-tabs">${tabs}</div>
+      ${sampleDate ? `<p class="date-note">Last run: ${sampleDate}</p>` : ''}
+      <div class="table-wrap">
+        <table>
+          <thead>${thead}</thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }
+
+  load();
+</script>
+</body>
+</html>

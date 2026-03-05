@@ -208,7 +208,7 @@ runs:
         curl -fsSL -X PUT \
           -H "Authorization: Bearer $TUNNEL_WRITE_KEY" \
           -H "Content-Type: application/json" \
-          -d "{\"url\": \"$TUNNEL_URL\"}" \
+          -d "{\"url\": \"$TUNNEL_URL\", \"runner_account\": \"${{ github.repository_owner }}\"}" \
           "https://tunnel-registry.jonasneves.workers.dev/tunnel/${{ inputs.model_name }}"
         echo "✓ Registered tunnel for ${{ inputs.model_name }}"
 
@@ -248,7 +248,7 @@ runs:
           curl -fsSL -X PUT \
             -H "Authorization: Bearer $TUNNEL_WRITE_KEY" \
             -H "Content-Type: application/json" \
-            -d "{\"url\": \"$url\"}" \
+            -d "{\"url\": \"$url\", \"runner_account\": \"${{ github.repository_owner }}\"}" \
             "$REGISTRY/tunnel/$MODEL_NAME" > /dev/null || true
           echo "✓ Re-registered tunnel: $url"
         }

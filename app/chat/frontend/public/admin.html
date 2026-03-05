@@ -146,6 +146,12 @@
     .model-status         { font-size: 11.5px; color: var(--text-secondary); margin-right: 4px; }
     .model-status.running { color: var(--success); }
 
+    .runner-badge {
+      font-size: 10px; color: var(--text-secondary);
+      background: var(--surface-raised); border: 1px solid var(--border);
+      border-radius: 4px; padding: 1px 6px; font-family: var(--font-mono);
+    }
+
     /* ── Footer ── */
     footer {
       border-top: 1px solid var(--border);
@@ -280,7 +286,7 @@
   async function fetchTunnels() {
     const res = await fetch(`${REGISTRY}/tunnels`);
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    return res.json(); // { model: url }
+    return res.json(); // { model: { url, runner_account } }
   }
 
   async function fetchRuns() {
@@ -446,6 +452,10 @@
         btn = `<button class="btn-success" onclick="startModel('${m.key}')">Start</button>`;
       }
 
+      const entry = tunnelMap[m.key];
+      const runnerAccount = entry?.runner_account;
+      const runnerBadge = runnerAccount ? `<span class="runner-badge">${runnerAccount}</span>` : '';
+
       return `
         <div class="model-card${isRunning ? ' running' : ''}">
           <div class="status-dot ${dotClass}"></div>
@@ -453,6 +463,7 @@
             <div class="model-name">${m.name}</div>
             <div class="model-key">${m.key}</div>
           </div>
+          ${runnerBadge}
           <span class="model-status${isRunning ? ' running' : ''}">${statusText}</span>
           ${btn}
         </div>`;
