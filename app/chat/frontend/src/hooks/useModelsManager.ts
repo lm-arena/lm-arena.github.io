@@ -191,8 +191,10 @@ export function useModelsManager() {
 
   const onlineModelIds = useMemo(() => {
     const isDev = window.location.hostname === 'localhost';
-    if (isDev) return new Set(modelsData.filter(m => m.type === 'self-hosted').map(m => m.id));
-    const online = new Set<string>();
+    // GitHub models are always reachable via the GitHub Models API
+    const githubModelIds = modelsData.filter(m => m.type === 'github').map(m => m.id);
+    if (isDev) return new Set([...modelsData.filter(m => m.type === 'self-hosted').map(m => m.id), ...githubModelIds]);
+    const online = new Set<string>(githubModelIds);
     for (const service of SERVICES) {
       if (onlineKeys.has(service.key)) online.add(service.modelId);
     }
