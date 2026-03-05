@@ -10,10 +10,10 @@
     },
     {
       "key": "qwen",
-      "name": "Qwen3 4B",
+      "name": "Qwen3.5 4B",
       "localPort": 8100,
       "category": "small",
-      "modelId": "qwen3-4b",
+      "modelId": "qwen3.5-4b",
       "rank": 2
     },
     {
@@ -49,11 +49,27 @@
       "rank": 4
     },
     {
+      "key": "phireasoning",
+      "name": "Phi-4 Mini Reasoning",
+      "localPort": 8111,
+      "category": "reasoning",
+      "modelId": "phi-4-mini-reasoning",
+      "rank": 4
+    },
+    {
       "key": "lfm2thinking",
       "name": "LFM2.5 1.2B Thinking",
       "localPort": 8108,
       "category": "small",
       "modelId": "lfm2.5-1.2b-thinking",
+      "rank": 5
+    },
+    {
+      "key": "gemma3n",
+      "name": "Gemma 3n E4B",
+      "localPort": 8204,
+      "category": "medium",
+      "modelId": "gemma-3n-e4b-it",
       "rank": 5
     },
     {
@@ -65,6 +81,14 @@
       "rank": 5
     },
     {
+      "key": "lfm2mini",
+      "name": "LFM2 350M",
+      "localPort": 8110,
+      "category": "small",
+      "modelId": "lfm2-350m",
+      "rank": 6
+    },
+    {
       "key": "gemma",
       "name": "Gemma 3 12B",
       "localPort": 8200,
@@ -73,11 +97,11 @@
       "rank": 6
     },
     {
-      "key": "mistral",
-      "name": "Mistral 7B v0.3",
+      "key": "falcon",
+      "name": "Falcon H1R 7B",
       "localPort": 8202,
       "category": "medium",
-      "modelId": "mistral-7b-instruct-v0.3",
+      "modelId": "falcon-h1r-7b",
       "rank": 7
     },
     {

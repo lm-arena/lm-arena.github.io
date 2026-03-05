@@ -9,18 +9,38 @@ import { writeFileSync } from 'fs';
 import { join } from 'path';
 
 const GITHUB_MODELS_CATALOG_URL = 'https://models.github.ai/catalog/models';
+const scriptDir = new URL('.', import.meta.url).pathname;
+
+function runModelsConfig(arg) {
+    return execSync(`python3 ../../../../config/models.py ${arg}`, {
+        encoding: 'utf-8',
+        cwd: scriptDir,
+    });
+}
 
 function getLocalModels() {
     try {
         const output = execSync('python3 ../../../../scripts/generate_models_json.py', {
             encoding: 'utf-8',
-            cwd: new URL('.', import.meta.url).pathname
+            cwd: scriptDir,
         });
         return JSON.parse(output).models;
     } catch (error) {
         console.error('❌ Failed to generate local models from config:', error.message);
         console.log('⚠️ Using empty local models list');
         return [];
+    }
+}
+
+function generateServicesJson() {
+    try {
+        const output = runModelsConfig('--services-json');
+        const outPath = join(process.cwd(), 'src', 'data', 'services.json');
+        writeFileSync(outPath, output);
+        const count = JSON.parse(output).services.length;
+        console.log(`✅ Generated src/data/services.json (${count} services from config/models.py)`);
+    } catch (error) {
+        console.error('❌ Failed to generate services.json:', error.message);
     }
 }
 
@@ -70,6 +90,8 @@ async function fetchGitHubModels() {
 }
 
 async function main() {
+    generateServicesJson();
+
     const localModels = getLocalModels();
     const apiModels = await fetchGitHubModels();
 

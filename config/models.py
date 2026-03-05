@@ -45,6 +45,8 @@ class ModelConfig:
     n_batch: int = 256
     max_concurrent: int = 2
     kv_cache_quant: bool = True
+    # Routing category for auto-routing (general/coding/reasoning/function_calling)
+    routing_category: str | None = None
     
     @property
     def service_url(self) -> str:
@@ -96,6 +98,7 @@ MODELS: dict[str, ModelConfig] = {
         hf_repo="unsloth/Qwen3.5-4B-GGUF",
         hf_file="Qwen3.5-4B-Q4_K_M.gguf",
         owned_by="qwen",
+        routing_category="general",
     ),
     "phi": ModelConfig(
         name="phi",
@@ -110,6 +113,7 @@ MODELS: dict[str, ModelConfig] = {
         hf_file="Phi-4-mini-instruct-Q4_K_M.gguf",
         owned_by="microsoft",
         n_ctx=8192,
+        routing_category="general",
     ),
     "functiongemma": ModelConfig(
         name="functiongemma",
@@ -123,6 +127,7 @@ MODELS: dict[str, ModelConfig] = {
         hf_repo="unsloth/functiongemma-270m-it-GGUF",
         hf_file="functiongemma-270m-it-Q8_0.gguf",
         owned_by="google",
+        routing_category="function_calling",
     ),
     "smollm3": ModelConfig(
         name="smollm3",
@@ -138,6 +143,7 @@ MODELS: dict[str, ModelConfig] = {
         owned_by="huggingfacetb",
         n_batch=512,
         max_concurrent=3,
+        routing_category="function_calling",
     ),
     "lfm2": ModelConfig(
         name="lfm2",
@@ -152,6 +158,7 @@ MODELS: dict[str, ModelConfig] = {
         hf_repo="LiquidAI/LFM2.5-1.2B-Instruct-GGUF",
         hf_file="LFM2.5-1.2B-Instruct-Q4_K_M.gguf",
         owned_by="liquidai",
+        routing_category="general",
     ),
     "dasd": ModelConfig(
         name="dasd",
@@ -167,6 +174,7 @@ MODELS: dict[str, ModelConfig] = {
         owned_by="alibaba-apsara",
         n_batch=512,
         max_concurrent=3,
+        routing_category="reasoning",
     ),
     "agentcpm": ModelConfig(
         name="agentcpm",
@@ -183,6 +191,7 @@ MODELS: dict[str, ModelConfig] = {
         n_ctx=4096,
         n_batch=512,
         max_concurrent=3,
+        routing_category="function_calling",
     ),
     "lfm2mini": ModelConfig(
         name="lfm2mini",
@@ -199,6 +208,7 @@ MODELS: dict[str, ModelConfig] = {
         n_ctx=8192,
         n_batch=512,
         max_concurrent=4,
+        routing_category="general",
     ),
     "phireasoning": ModelConfig(
         name="phireasoning",
@@ -215,6 +225,7 @@ MODELS: dict[str, ModelConfig] = {
         n_ctx=8192,
         n_batch=512,
         max_concurrent=3,
+        routing_category="reasoning",
     ),
     "lfm2thinking": ModelConfig(
         name="lfm2thinking",
@@ -228,6 +239,7 @@ MODELS: dict[str, ModelConfig] = {
         hf_repo="LiquidAI/LFM2.5-1.2B-Thinking-GGUF",
         hf_file="LFM2.5-1.2B-Thinking-Q4_K_M.gguf",
         owned_by="liquidai",
+        routing_category="reasoning",
     ),
     "jancode": ModelConfig(
         name="jancode",
@@ -243,6 +255,7 @@ MODELS: dict[str, ModelConfig] = {
         owned_by="janhq",
         n_batch=512,
         max_concurrent=3,
+        routing_category="coding",
     ),
 
     # Medium models (7B-30B params)
@@ -259,6 +272,7 @@ MODELS: dict[str, ModelConfig] = {
         hf_file="gemma-3-12b-it-Q4_K_M.gguf",
         owned_by="google",
         n_ctx=8192,
+        routing_category="general",
     ),
     "llama": ModelConfig(
         name="llama",
@@ -273,6 +287,7 @@ MODELS: dict[str, ModelConfig] = {
         hf_file="Llama-3.2-3B-Instruct-Q4_K_M.gguf",
         owned_by="meta",
         chat_format="llama-3",
+        routing_category="general",
     ),
     "falcon": ModelConfig(
         name="falcon",
@@ -286,6 +301,7 @@ MODELS: dict[str, ModelConfig] = {
         hf_repo="unsloth/Falcon-H1R-7B-GGUF",
         hf_file="Falcon-H1R-7B-Q4_K_M.gguf",
         owned_by="tii",
+        routing_category="reasoning",
     ),
     "gemma3n": ModelConfig(
         name="gemma3n",
@@ -302,6 +318,7 @@ MODELS: dict[str, ModelConfig] = {
         n_ctx=8192,
         n_batch=256,
         max_concurrent=2,
+        routing_category="general",
     ),
     "rnj": ModelConfig(
         name="rnj",
@@ -318,6 +335,7 @@ MODELS: dict[str, ModelConfig] = {
         n_ctx=2048,
         n_batch=512,
         max_concurrent=3,
+        routing_category="function_calling",
     ),
 
     # Reasoning models
@@ -334,6 +352,7 @@ MODELS: dict[str, ModelConfig] = {
         hf_file="DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf",
         owned_by="deepseek",
         workflow_file="inference.yml",
+        routing_category="reasoning",
     ),
     "nanbeige": ModelConfig(
         name="nanbeige",
@@ -350,6 +369,7 @@ MODELS: dict[str, ModelConfig] = {
         n_ctx=2048,
         n_batch=512,
         max_concurrent=4,
+        routing_category="reasoning",
     ),
     "gptoss": ModelConfig(
         name="gptoss",
@@ -364,6 +384,7 @@ MODELS: dict[str, ModelConfig] = {
         hf_file="gpt-oss-20b-Q6_K.gguf",
         owned_by="openai",
         workflow_file="inference.yml",
+        routing_category="function_calling",
     ),
 }
 
@@ -409,6 +430,30 @@ if __name__ == "__main__":
         if arg == "--inference-names":
             names = [m.name for m in get_inference_models()]
             print(json.dumps(names))
+            sys.exit(0)
+
+        if arg == "--services-json":
+            services = [
+                {
+                    "key": m.name,
+                    "name": m.display_name,
+                    "localPort": m.port,
+                    "category": m.category.value,
+                    "modelId": m.model_id,
+                    "rank": m.rank,
+                }
+                for m in get_inference_models()
+            ]
+            print(json.dumps({"services": services}, indent=2))
+            sys.exit(0)
+
+        if arg == "--route-map":
+            from collections import defaultdict
+            route_map: dict[str, list[str]] = defaultdict(list)
+            for m in get_inference_models():
+                if m.routing_category:
+                    route_map[m.routing_category].append(m.name)
+            print(json.dumps(dict(route_map), indent=2))
             sys.exit(0)
 
         # CLI mode: python config/models.py <model_name> [field]

@@ -7,10 +7,10 @@ const CORS_HEADERS = {
 
 // Category → preferred models (in priority order)
 const ROUTE_MAP = {
-  coding:           ['jancode'],
-  reasoning:        ['nanbeige', 'r1qwen'],
-  function_calling: ['functiongemma', 'agentcpm'],
-  general:          ['gemma', 'llama'],
+  reasoning:       ['nanbeige', 'dasd', 'phireasoning', 'lfm2thinking', 'r1qwen', 'falcon'],
+  general:         ['qwen', 'lfm2', 'gemma3n', 'lfm2mini', 'gemma', 'phi', 'llama'],
+  function_calling:['smollm3', 'agentcpm', 'rnj', 'functiongemma', 'gptoss'],
+  coding:          ['jancode'],
 };
 
 function jsonResponse(data, status = 200) {
