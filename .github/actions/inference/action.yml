@@ -169,7 +169,8 @@ runs:
         TUNNEL_WRITE_KEY: ${{ inputs.tunnel_write_key }}
       run: |
         curl -fsSL -o /tmp/cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64.deb
-        sudo dpkg -i /tmp/cloudflared.deb || true  # post-install service setup fails on Actions, binary is still installed
+        dpkg-deb --extract /tmp/cloudflared.deb /tmp/cloudflared-pkg
+        sudo cp /tmp/cloudflared-pkg/usr/bin/cloudflared /usr/local/bin/
         cloudflared tunnel --no-autoupdate --url http://localhost:${{ inputs.port }} > /tmp/cloudflared.log 2>&1 &
 
         TUNNEL_URL=""
