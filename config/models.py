@@ -79,7 +79,8 @@ class ModelConfig:
 # =============================================================================
 # PORT ALLOCATION SCHEME
 # =============================================================================
-# 8100-8199 : Small models (< 7B params)
+# 8100-8199 : Small models (< 7B params); also hosts phireasoning (REASONING
+#             category, small footprint) at 8111 for resource reasons
 # 8200-8299 : Medium models (7B-30B params)
 # 8300-8399 : Reasoning/specialty models
 # =============================================================================
@@ -168,7 +169,7 @@ MODELS: dict[str, ModelConfig] = {
         display_name="DASD-4B Thinking",
         inference_dir="dasd-inference",
         description="Reasoning model with thinking capabilities from Alibaba-Apsara",
-        rank=2,
+        rank=14,
         hf_repo="mradermacher/DASD-4B-Thinking-GGUF",
         hf_file="DASD-4B-Thinking.Q4_K_M.gguf",
         owned_by="alibaba-apsara",
@@ -184,7 +185,7 @@ MODELS: dict[str, ModelConfig] = {
         display_name="AgentCPM-Explore 4B",
         inference_dir="agentcpm-inference",
         description="Agentic exploration model for autonomous task execution",
-        rank=3,
+        rank=15,
         hf_repo="openbmb/AgentCPM-Explore-GGUF",
         hf_file="AgentCPM-Explore.Q4_K_M.gguf",
         owned_by="openbmb",
@@ -329,8 +330,8 @@ MODELS: dict[str, ModelConfig] = {
         inference_dir="rnj-inference",
         description="Tool-calling, agentic (20.8% SWE-Bench Verified)",
         rank=9,
-        hf_repo="unsloth/rnj-1-instruct-GGUF",
-        hf_file="rnj-1-instruct-Q4_K_M.gguf",
+        hf_repo="EssentialAI/rnj-1-instruct-GGUF",
+        hf_file="Rnj-1-Instruct-8B-Q4_K_M.gguf",
         owned_by="essentialai",
         n_ctx=2048,
         n_batch=512,

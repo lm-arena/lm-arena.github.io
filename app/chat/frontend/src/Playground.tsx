@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useLayoutEffect, useCallback, useMemo, lazy, Suspense } from 'react';
 import { Model, Mode, Position, BackgroundStyle } from './types';
-import { BG_STYLES, MODE_COLORS, LAYOUT, UI_BUILDER_PROMPT } from './constants';
+import { BG_STYLES, PLAYGROUND_BACKGROUND, LAYOUT, UI_BUILDER_PROMPT } from './constants';
 import ModelDock from './components/ModelDock';
 import PromptInput from './components/PromptInput';
 import Header from './components/Header';
@@ -511,7 +511,7 @@ function PlaygroundInner() {
     resetPendingStream,
   } = useStreamAccumulator(setModelsData);
 
-  const dragSelectionActiveRefTemp = useRef(false);
+  const dragSelectionActiveRef = useRef(false);
 
   const {
     arenaOffsetYRef,
@@ -521,13 +521,12 @@ function PlaygroundInner() {
     ensureRaf,
   } = useArenaScroll({
     visualizationAreaRef,
-    dragSelectionActiveRef: dragSelectionActiveRefTemp,
+    dragSelectionActiveRef,
   });
 
   const {
     selectionRect,
     isSelecting,
-    dragSelectionActiveRef,
   } = useSelectionBox({
     rootContainerRef,
     visualizationAreaRef,
@@ -539,9 +538,8 @@ function PlaygroundInner() {
     selectedCardIds,
     setSelectedCardIds,
     suppressClickRef,
+    dragSelectionActiveRef,
   });
-
-  dragSelectionActiveRefTemp.current = dragSelectionActiveRef.current;
 
   const { dragState, handlePointerDown } = useCardReorder({
     visualizationAreaRef,
@@ -617,11 +615,11 @@ function PlaygroundInner() {
     const limit = SMART_DEFAULT_LIMITS[targetMode];
     if (limit === undefined) return [];
 
-    const availableSelfHosted = modelsData
-      .filter(m => m.type === 'self-hosted')
+    const available = modelsData
+      .filter(m => m.id !== 'auto')
       .map(m => m.id);
 
-    return availableSelfHosted.slice(0, limit);
+    return available.slice(0, limit);
   }, [modelsData]);
 
   const handleModeChange = useCallback((nextMode: Mode) => {
@@ -756,34 +754,27 @@ function PlaygroundInner() {
     debate: { responses: {}, moderatorSynthesis: '', phaseLabel: null, executionTimes: {}, isGenerating: false, speaking: new Set() },
   });
 
-  const modelsDataRef = useRef(modelsData);
-  const moderatorSynthesisRef = useRef(moderatorSynthesis);
-  const phaseLabelRef = useRef(phaseLabel);
-  const executionTimesRef = useRef(executionTimes);
-  const isGeneratingRef = useRef(isGenerating);
-  const speakingRef = useRef(speaking);
-  useEffect(() => { modelsDataRef.current = modelsData; }, [modelsData]);
-  useEffect(() => { moderatorSynthesisRef.current = moderatorSynthesis; }, [moderatorSynthesis]);
-  useEffect(() => { phaseLabelRef.current = phaseLabel; }, [phaseLabel]);
-  useEffect(() => { executionTimesRef.current = executionTimes; }, [executionTimes]);
-  useEffect(() => { isGeneratingRef.current = isGenerating; }, [isGenerating]);
-  useEffect(() => { speakingRef.current = speaking; }, [speaking]);
+  const arenaStateSnapshotRef = useRef({ modelsData, moderatorSynthesis, phaseLabel, executionTimes, isGenerating, speaking });
+  useEffect(() => {
+    arenaStateSnapshotRef.current = { modelsData, moderatorSynthesis, phaseLabel, executionTimes, isGenerating, speaking };
+  }, [modelsData, moderatorSynthesis, phaseLabel, executionTimes, isGenerating, speaking]);
 
   useEffect(() => {
     const prevMode = prevModeForClearRef.current;
 
     if (ARENA_MODES.includes(prevMode) && ARENA_MODES.includes(mode) && prevMode !== mode) {
+      const snap = arenaStateSnapshotRef.current;
       const currentResponses: Record<string, { response: string; thinking?: string; error?: string }> = {};
-      modelsDataRef.current.forEach(m => {
+      snap.modelsData.forEach(m => {
         currentResponses[m.id] = { response: m.response, thinking: m.thinking, error: m.error };
       });
       arenaModeStateRef.current[prevMode] = {
         responses: currentResponses,
-        moderatorSynthesis: moderatorSynthesisRef.current,
-        phaseLabel: phaseLabelRef.current,
-        executionTimes: executionTimesRef.current,
-        isGenerating: isGeneratingRef.current,
-        speaking: new Set(speakingRef.current),
+        moderatorSynthesis: snap.moderatorSynthesis,
+        phaseLabel: snap.phaseLabel,
+        executionTimes: snap.executionTimes,
+        isGenerating: snap.isGenerating,
+        speaking: new Set(snap.speaking),
       };
 
       const savedState = arenaModeStateRef.current[mode];
@@ -959,9 +950,9 @@ function PlaygroundInner() {
       ref={rootContainerRef}
       className={`fixed inset-0 overflow-hidden text-white ${bgClass}`}
       style={{
-        backgroundColor: MODE_COLORS[mode],
+        backgroundColor: PLAYGROUND_BACKGROUND,
         transition: 'background-color 1s ease',
-        ...(bgStyle === 'none' ? { background: MODE_COLORS[mode] } : {}),
+        ...(bgStyle === 'none' ? { background: PLAYGROUND_BACKGROUND } : {}),
         ...(isSelecting ? { userSelect: 'none', WebkitUserSelect: 'none' } : {}),
       }}
       onClick={handleBackgroundClick}

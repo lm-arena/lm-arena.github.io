@@ -7,21 +7,25 @@ Uses llama-server wrapper due to llama-cpp-python binding incompatibilities
 
 import os
 import sys
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
 import uvicorn
 from shared.llama_server_wrapper import LlamaServerConfig, create_llama_server_app
+from config.models import MODELS
+
+m = MODELS["rnj"]
 
 config = LlamaServerConfig(
-    model_id="rnj-1-instruct",
-    display_name="RNJ-1 Instruct",
-    owned_by="essentialai",
-    default_repo="EssentialAI/rnj-1-instruct-GGUF",
-    default_file="Rnj-1-Instruct-8B-Q4_K_M.gguf",
-    default_port=8203,
-    n_ctx=2048,
-    n_batch=512,
-    max_concurrent=3,
+    model_id=m.model_id,
+    display_name=m.display_name,
+    owned_by=m.owned_by,
+    default_repo=m.hf_repo,
+    default_file=m.hf_file,
+    default_port=m.port,
+    n_ctx=m.n_ctx,
+    n_threads=m.n_threads,
+    n_batch=m.n_batch,
+    max_concurrent=m.max_concurrent,
     startup_timeout=120,
 )
 

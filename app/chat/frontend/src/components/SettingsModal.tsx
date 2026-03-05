@@ -23,18 +23,6 @@ const BG_LABELS: Record<BackgroundStyle, string> = {
   'mesh': 'Mesh',
   'animated-mesh': 'Animated',
   'none': 'Solid',
-  // Other styles not in BG_STYLES but in the type
-  'particles': 'Particles',
-  'gradient': 'Gradient',
-  'waves': 'Waves',
-  'cyber': 'Cyber',
-  'aurora': 'Aurora',
-  'starfield': 'Starfield',
-  'matrix': 'Matrix',
-  'nebula': 'Nebula',
-  'blocks': 'Blocks',
-  'circuit': 'Circuit',
-  'geo': 'Geo',
 };
 
 const TABS: { id: SettingsTab; label: string; icon: React.ReactNode }[] = [

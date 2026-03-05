@@ -58,20 +58,8 @@ services:
       <<: *common-env
       MODEL_NAME: llama
     ports:
-      - "${LLAMA_PORT:-8200}:8000"
+      - "${LLAMA_PORT:-8201}:8000"
     profiles: ["all", "llama"]
-
-  mistral:
-    <<: *inference-common
-    build:
-      context: .
-      dockerfile: ./app/shared/Dockerfile.inference
-    environment:
-      <<: *common-env
-      MODEL_NAME: mistral
-    ports:
-      - "${MISTRAL_PORT:-8202}:8000"
-    profiles: ["all", "mistral"]
 
   gemma:
     <<: *inference-common

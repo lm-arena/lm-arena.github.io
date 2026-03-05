@@ -29,6 +29,7 @@ interface UseSelectionBoxParams {
   selectedCardIds: Set<string>;
   setSelectedCardIds: React.Dispatch<React.SetStateAction<Set<string>>>;
   suppressClickRef: ClickSuppressRef;
+  dragSelectionActiveRef: React.MutableRefObject<boolean>;
 }
 
 function normalizeRect(a: SelectionPoint, b: SelectionPoint) {
@@ -57,13 +58,13 @@ export function useSelectionBox({
   selectedCardIds,
   setSelectedCardIds,
   suppressClickRef,
+  dragSelectionActiveRef,
 }: UseSelectionBoxParams) {
   const [dragSelection, setDragSelection] = useState<SelectionState | null>(null);
-  const dragSelectionActiveRef = useRef(false);
 
   useEffect(() => {
     dragSelectionActiveRef.current = dragSelection != null;
-  }, [dragSelection]);
+  }, [dragSelection, dragSelectionActiveRef]);
 
   useEffect(() => {
     const handleMouseDown = (event: MouseEvent) => {
@@ -225,12 +226,11 @@ export function useSelectionBox({
   const clearSelection = useCallback(() => {
     setDragSelection(null);
     dragSelectionActiveRef.current = false;
-  }, []);
+  }, [dragSelectionActiveRef]);
 
   return {
     selectionRect,
     isSelecting: dragSelection != null,
-    dragSelectionActiveRef,
     clearSelection,
   };
 }

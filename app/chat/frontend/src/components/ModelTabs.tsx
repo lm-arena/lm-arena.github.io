@@ -88,10 +88,7 @@ export default function ModelTabs({ models, selectedModels, onToggleModel, isGen
     const showGithubWarning = selectedApiCount > 0 && !githubToken;
 
     const ChevronIcon = dropDirection === 'up' ? ChevronUp : ChevronDown;
-    const chevronRotation = (isOpen: boolean) => {
-        if (dropDirection === 'up') return isOpen ? 'rotate-180' : '';
-        return isOpen ? 'rotate-180' : '';
-    };
+    const chevronRotation = (isOpen: boolean) => isOpen ? 'rotate-180' : '';
 
     const warnings = showGithubWarning && (
         <div className="flex flex-col items-center gap-1">

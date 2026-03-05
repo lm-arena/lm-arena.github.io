@@ -4,9 +4,7 @@ import { Zap } from 'lucide-react';
 import StatusIndicator from '../StatusIndicator';
 import Typewriter from '../Typewriter';
 import type { Model, Mode } from '../../types';
-
-type OrchestratorAutoScope = 'all' | 'self-hosted' | 'api';
-type StatusState = 'idle' | 'responding' | 'done' | 'waiting' | 'error';
+import { type OrchestratorAutoScope, type StatusState, getStatusLabel } from './ArenaCanvas';
 
 interface OrchestratorCardProps {
   mode: Mode;
@@ -37,16 +35,6 @@ interface OrchestratorCardProps {
 }
 
 const CIRCLE_CARD_SIZE = 96;
-
-function getStatusLabel(status: StatusState): string {
-  switch (status) {
-    case 'error': return 'Error';
-    case 'responding': return 'Responding';
-    case 'done': return 'Done';
-    case 'waiting': return 'Waiting';
-    default: return 'Ready';
-  }
-}
 
 export function OrchestratorCard({
   mode,

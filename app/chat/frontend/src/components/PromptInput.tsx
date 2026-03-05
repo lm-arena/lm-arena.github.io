@@ -108,7 +108,7 @@ export default function PromptInput({
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 if (isGenerating) {
-                  return; // Don't send if generating, maybe? Or allow queuing? Typically block.
+                  return;
                 }
                 if (inputRef.current?.value) {
                   onSendMessage(inputRef.current.value);

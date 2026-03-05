@@ -143,9 +143,6 @@ export default function Header({
 
   return (
     <div className="fixed top-0 left-0 right-0 flex items-center justify-between mb-2 px-3 sm:px-6 pt-4 sm:pt-6 z-50 pointer-events-none transition-all duration-300">
-      {/* Background layer */}
-      <div className="absolute inset-0 pointer-events-auto" style={{ height: '100%', zIndex: -1 }} />
-
       {/* Left: Gesture */}
       <div className="flex items-center gap-2 w-auto pointer-events-auto z-20">
         {gestureButtonSlot}

@@ -14,7 +14,7 @@ import { DragState } from '../../hooks/useCardReorder';
 import { ArenaContextMenu } from './types';
 import { OrchestratorCard } from './OrchestratorCard';
 
-type OrchestratorAutoScope = 'all' | 'self-hosted' | 'api';
+export type OrchestratorAutoScope = 'all' | 'self-hosted' | 'api';
 
 interface ArenaCanvasProps {
   mode: Mode;
@@ -40,7 +40,7 @@ interface ArenaCanvasProps {
   moderatorModel?: Model;
   moderatorId: string;
   orchestratorTransform: string;
-  orchestratorStatus: 'idle' | 'responding' | 'done' | 'waiting';
+  orchestratorStatus: StatusState;
   moderatorSynthesis: string;
   isSynthesizing: boolean;
   isGenerating: boolean;
@@ -430,33 +430,6 @@ export function ArenaCanvas(props: ArenaCanvasProps) {
         />
       )}
 
-      {mode !== 'compare' && (
-        <svg
-          className="absolute pointer-events-none transition-opacity duration-700"
-          style={{
-            width: '1000px',
-            height: '1000px',
-            opacity: 0.2
-          }}
-        >
-          <circle
-            cx="500"
-            cy="500"
-            r={layoutRadius}
-            fill="none"
-            stroke="url(#circleGrad)"
-            strokeWidth="1"
-            strokeDasharray="8,4"
-          />
-          <defs>
-            <linearGradient id="circleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#3b82f6" />
-              <stop offset="50%" stopColor="#8b5cf6" />
-              <stop offset="100%" stopColor="#3b82f6" />
-            </linearGradient>
-          </defs>
-        </svg>
-      )}
     </>
   );
 }
@@ -654,13 +627,12 @@ const GRID_CONTENT_STYLE: React.CSSProperties = {
   WebkitFontSmoothing: 'antialiased',
   MozOsxFontSmoothing: 'grayscale',
   textRendering: 'optimizeLegibility',
-  opacity: 1,
   transition: 'opacity 0.3s ease-out',
 };
 
-type StatusState = 'idle' | 'responding' | 'done' | 'waiting' | 'error';
+export type StatusState = 'idle' | 'responding' | 'done' | 'waiting' | 'error';
 
-function getStatusLabel(status: StatusState): string {
+export function getStatusLabel(status: StatusState): string {
   switch (status) {
     case 'error': return 'Error';
     case 'responding': return 'Responding';

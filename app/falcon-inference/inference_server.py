@@ -1,19 +1,24 @@
 import os
 import sys
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
 import uvicorn
 from shared.llama_server_wrapper import LlamaServerConfig, create_llama_server_app
+from config.models import MODELS
+
+m = MODELS["falcon"]
 
 config = LlamaServerConfig(
-    model_id="falcon-h1r-7b",
-    display_name="Falcon H1R 7B",
-    owned_by="tii",
-    default_repo="unsloth/Falcon-H1R-7B-GGUF",
-    default_file="Falcon-H1R-7B-Q4_K_M.gguf",
-    default_port=8202,
-    n_ctx=4096,
-    max_concurrent=2,
+    model_id=m.model_id,
+    display_name=m.display_name,
+    owned_by=m.owned_by,
+    default_repo=m.hf_repo,
+    default_file=m.hf_file,
+    default_port=m.port,
+    n_ctx=m.n_ctx,
+    n_threads=m.n_threads,
+    n_batch=m.n_batch,
+    max_concurrent=m.max_concurrent,
 )
 
 app = create_llama_server_app(config)

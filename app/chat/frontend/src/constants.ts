@@ -116,7 +116,7 @@ export const CURATED_TOPICS: TopicPrompt[] = [
 
 // Mode-specific example prompts for "try an example" (hardcoded, not in ticker)
 // Designed for demo brevity: built-in constraints, opinionated/fun, quick to read
-export const MODE_EXAMPLE_PROMPTS: Record<Mode, string[]> = {
+export const MODE_EXAMPLE_PROMPTS: Partial<Record<Mode, string[]>> = {
   analyze: [
     "What's the most important programming principle?",
     "Should code comments explain 'what' or 'why'?",
@@ -127,8 +127,6 @@ export const MODE_EXAMPLE_PROMPTS: Record<Mode, string[]> = {
     "Should AI be allowed to write its own code?",
     "What will never be automated by AI?",
   ],
-  compare: [],
-  chat: [],
 };
 
 export const TOPIC_PACKS: TopicPack[] = [
@@ -204,14 +202,7 @@ export const TRENDING_FALLBACK: TrendingTopic[] = [
 
 export const BG_STYLES: BackgroundStyle[] = ['dots-mesh', 'dots', 'dots-fade', 'grid', 'mesh', 'animated-mesh', 'none'];
 
-const BASE_BACKGROUND = '#0f172a'; // Unified playground background tone
-
-export const MODE_COLORS: Record<Mode, string> = {
-  compare: BASE_BACKGROUND,
-  analyze: BASE_BACKGROUND,
-  debate: BASE_BACKGROUND,
-  chat: BASE_BACKGROUND,
-};
+export const PLAYGROUND_BACKGROUND = '#0f172a';
 
 // Generation defaults - centralized for easy maintenance
 export const GENERATION_DEFAULTS = {

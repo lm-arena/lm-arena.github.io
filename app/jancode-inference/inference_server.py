@@ -6,20 +6,25 @@ Uses llama-server wrapper due to llama-cpp-python binding incompatibilities.
 
 import os
 import sys
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
 import uvicorn
 from shared.llama_server_wrapper import LlamaServerConfig, create_llama_server_app
+from config.models import MODELS
+
+m = MODELS["jancode"]
 
 config = LlamaServerConfig(
-    model_id="jan-code-4b",
-    display_name="Jan-code 4B",
-    owned_by="janhq",
-    default_repo="janhq/Jan-code-4b-gguf",
-    default_file="Jan-code-4b-Q4_K_M.gguf",
-    default_port=8109,
-    n_ctx=4096,
-    max_concurrent=3,
+    model_id=m.model_id,
+    display_name=m.display_name,
+    owned_by=m.owned_by,
+    default_repo=m.hf_repo,
+    default_file=m.hf_file,
+    default_port=m.port,
+    n_ctx=m.n_ctx,
+    n_threads=m.n_threads,
+    n_batch=m.n_batch,
+    max_concurrent=m.max_concurrent,
 )
 
 app = create_llama_server_app(config)

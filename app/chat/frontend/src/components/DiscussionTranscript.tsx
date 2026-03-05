@@ -36,7 +36,7 @@ export default function DiscussionTranscript({
     const bottomRef = useRef<HTMLDivElement>(null);
 
     // Get example prompts for current mode
-    const examplePrompts = mode ? MODE_EXAMPLE_PROMPTS[mode] : [];
+    const examplePrompts = (mode ? MODE_EXAMPLE_PROMPTS[mode] : null) ?? [];
 
     // Auto-scroll to bottom when history changes
     useEffect(() => {
