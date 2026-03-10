@@ -14,7 +14,6 @@ export async function connectGitHub(): Promise<GitHubAuth> {
   const authUrl = new URL('https://github.com/login/oauth/authorize');
   authUrl.searchParams.set('client_id', GITHUB_CLIENT_ID);
   authUrl.searchParams.set('redirect_uri', redirectUri);
-  authUrl.searchParams.set('scope', 'workflow');
   authUrl.searchParams.set('state', state);
 
   const width = 500;
