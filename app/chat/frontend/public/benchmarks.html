@@ -94,14 +94,7 @@
 
     /* Suite tooltip */
     .tab-wrap { position: relative; display: inline-flex; align-items: center; gap: 4px; }
-    .tip-icon {
-      width: 14px; height: 14px; border-radius: 50%;
-      background: var(--surface-raised); border: 1px solid var(--border);
-      color: var(--text-secondary); font-size: 9px; font-weight: 700;
-      display: inline-flex; align-items: center; justify-content: center;
-      cursor: default; flex-shrink: 0; line-height: 1;
-    }
-    .tip-box {
+.tip-box {
       position: absolute; bottom: calc(100% + 8px); left: 0;
       background: var(--surface-raised); border: 1px solid var(--border);
       border-radius: var(--radius); padding: 8px 10px;
@@ -326,7 +319,7 @@
       const tooltip = `<div class="tip-box"><strong>${info.full ?? info.name}</strong>${info.desc}</div>`;
       return `<div class="tab-wrap">
         <button class="tab${s === activeSuite ? ' active' : ''}" onclick="setTab('${s}','${activeDate}')">${s}</button>
-        <span class="tip-icon">?</span>${tooltip}
+        ${tooltip}
       </div>`;
     }).join('');
 
