@@ -45,8 +45,7 @@ htmlcov/
 # Models (large files - don't commit)
 *.gguf
 *.bin
-models/
-!docs/models/
+/models/
 
 # Node
 node_modules/
