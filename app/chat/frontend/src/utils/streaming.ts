@@ -164,6 +164,54 @@ export type SseDeltaEvent =
   | { type: 'done' }
   | { type: 'error'; error: string };
 
+export interface CompletionPayload {
+  model: string;
+  messages: Array<{ role: string; content: string }>;
+  max_tokens: number;
+  temperature: number;
+  stream: true;
+}
+
+/**
+ * Fetches a streaming chat completion from `url`, checks response.ok,
+ * then pipes the body through readSseStream. Silently swallows AbortError;
+ * yields an error event for all other failures.
+ */
+export async function* streamCompletion(
+  url: string,
+  payload: CompletionPayload,
+  githubToken: string | null,
+  signal?: AbortSignal,
+): AsyncGenerator<SseDeltaEvent> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (githubToken) {
+    headers['Authorization'] = `Bearer ${githubToken}`;
+  }
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload),
+      signal,
+    });
+
+    if (!response.ok) {
+      yield { type: 'error', error: `HTTP ${response.status}` };
+      return;
+    }
+
+    yield* readSseStream(response.body!);
+  } catch (error: unknown) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      return;
+    }
+    yield { type: 'error', error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
 /**
  * Reads a streaming OpenAI-compatible SSE response body and yields typed
  * delta events. The caller is responsible for the fetch() call and for

@@ -5,7 +5,7 @@
 
 import { splitThinkingContent } from '../utils/thinking';
 import { DEBATE_TURN_SYSTEM } from '../constants';
-import { readSseStream } from '../utils/streaming';
+import { streamCompletion } from '../utils/streaming';
 
 export interface DebateTurn {
   turn_number: number;
@@ -95,51 +95,6 @@ Provide your response:`;
   }
 }
 
-async function* streamModelDirect(
-  modelId: string,
-  modelKey: string,
-  modelUrl: string,
-  messages: Array<{ role: string; content: string }>,
-  maxTokens: number,
-  temperature: number,
-  githubToken: string | null,
-  signal: AbortSignal
-): AsyncGenerator<{ type: 'chunk' | 'done' | 'error'; content?: string; error?: string }> {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-
-  if (githubToken) {
-    headers['Authorization'] = `Bearer ${githubToken}`;
-  }
-
-  try {
-    const response = await fetch(`${modelUrl}/chat/completions`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        model: modelKey,
-        messages,
-        max_tokens: maxTokens,
-        temperature,
-        stream: true,
-      }),
-      signal,
-    });
-
-    if (!response.ok) {
-      yield { type: 'error', error: `HTTP ${response.status}` };
-      return;
-    }
-
-    yield* readSseStream(response.body!);
-  } catch (error: unknown) {
-    if (error instanceof Error && error.name === 'AbortError') {
-      return;
-    }
-    yield { type: 'error', error: error instanceof Error ? error.message : 'Unknown error' };
-  }
-}
 
 async function* executeTurn(
   query: string,
@@ -190,7 +145,7 @@ async function* executeTurn(
     messages.push({ role: 'system', content: DEBATE_TURN_SYSTEM });
     messages.push({ role: 'user', content: prompt });
 
-    for await (const event of streamModelDirect(modelId, modelKeys?.[modelId] ?? modelId, modelUrl, messages, maxTokens, temperature, githubToken, signal)) {
+    for await (const event of streamCompletion(`${modelUrl}/chat/completions`, { model: modelKeys?.[modelId] ?? modelId, messages, max_tokens: maxTokens, temperature, stream: true }, githubToken, signal)) {
       if (event.type === 'chunk') {
         fullResponse += event.content;
         yield {

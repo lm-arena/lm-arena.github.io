@@ -5,7 +5,7 @@
 
 import { splitThinkingContent } from '../utils/thinking';
 import { ANALYZE_RESPONSE_SYSTEM } from '../constants';
-import { readSseStream } from '../utils/streaming';
+import { streamCompletion } from '../utils/streaming';
 
 export interface AnalyzeEvent {
   type: 'analyze_start' | 'model_start' | 'model_chunk' | 'model_response' | 'model_error' | 'analysis_complete' | 'analyze_complete' | 'error';
@@ -127,50 +127,6 @@ function findUniqueContributions(responses: Array<{ model_id: string; response: 
   return unique;
 }
 
-async function* streamModelDirect(
-  modelId: string,
-  modelKey: string,
-  modelUrl: string,
-  messages: Array<{ role: string; content: string }>,
-  maxTokens: number,
-  githubToken: string | null,
-  signal: AbortSignal
-): AsyncGenerator<{ type: 'chunk' | 'done' | 'error'; content?: string; error?: string }> {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-
-  if (githubToken) {
-    headers['Authorization'] = `Bearer ${githubToken}`;
-  }
-
-  try {
-    const response = await fetch(`${modelUrl}/chat/completions`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        model: modelKey,
-        messages,
-        max_tokens: maxTokens,
-        temperature: 0.7,
-        stream: true,
-      }),
-      signal,
-    });
-
-    if (!response.ok) {
-      yield { type: 'error', error: `HTTP ${response.status}` };
-      return;
-    }
-
-    yield* readSseStream(response.body!);
-  } catch (error: unknown) {
-    if (error instanceof Error && error.name === 'AbortError') {
-      return;
-    }
-    yield { type: 'error', error: error instanceof Error ? error.message : 'Unknown error' };
-  }
-}
 
 export async function* runAnalyze(params: AnalyzeParams): AsyncGenerator<AnalyzeEvent> {
   const { query, participants, maxTokens, systemPrompt, githubToken, signal, modelEndpoints, modelKeys, modelIdToName } = params;
@@ -215,7 +171,7 @@ export async function* runAnalyze(params: AnalyzeParams): AsyncGenerator<Analyze
     let fullResponse = '';
 
     try {
-      for await (const event of streamModelDirect(modelId, modelKeys?.[modelId] ?? modelId, modelUrl, messages, maxTokens, githubToken, signal)) {
+      for await (const event of streamCompletion(`${modelUrl}/chat/completions`, { model: modelKeys?.[modelId] ?? modelId, messages, max_tokens: maxTokens, temperature: 0.7, stream: true }, githubToken, signal)) {
         if (event.type === 'chunk') {
           fullResponse += event.content;
           modelResponses[modelId] = fullResponse;
