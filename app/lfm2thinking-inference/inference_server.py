@@ -2,29 +2,33 @@
 LFM2.5 1.2B Thinking Inference Server
 
 Uses llama-server wrapper due to llama-cpp-python binding incompatibilities.
+flash_attn and kv_cache_quant are disabled per ModelConfig: LiquidAI's hybrid
+LFM2.5 design causes llama_decode -1 with either enabled.
 """
 
 import os
 import sys
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
 import uvicorn
 from shared.llama_server_wrapper import LlamaServerConfig, create_llama_server_app
+from config.models import MODELS
+
+m = MODELS["lfm2thinking"]
 
 config = LlamaServerConfig(
-    model_id="lfm2.5-1.2b-thinking",
-    display_name="LFM2.5 1.2B Thinking",
-    owned_by="liquidai",
-    default_repo="LiquidAI/LFM2.5-1.2B-Thinking-GGUF",
-    default_file="LFM2.5-1.2B-Thinking-Q4_K_M.gguf",
-    default_port=8108,
-    n_ctx=4096,
-    max_concurrent=6,
-    # LFM2.5 uses short convolution + GQA blocks (no SSM); LiquidAI's design
-    # explicitly excludes flash attention. Both flash_attn and kv_cache_quant
-    # cause llama_decode -1 on this architecture. See docs/models/lfm2thinking.md
-    flash_attn=False,
-    kv_cache_quant=False,
+    model_id=m.model_id,
+    display_name=m.display_name,
+    owned_by=m.owned_by,
+    default_repo=m.hf_repo,
+    default_file=m.hf_file,
+    default_port=m.port,
+    n_ctx=m.n_ctx,
+    n_threads=m.n_threads,
+    n_batch=m.n_batch,
+    max_concurrent=m.max_concurrent,
+    flash_attn=m.flash_attn,
+    kv_cache_quant=m.kv_cache_quant,
 )
 
 app = create_llama_server_app(config)

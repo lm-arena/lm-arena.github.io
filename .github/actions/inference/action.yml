@@ -53,15 +53,15 @@ runs:
 
         CONFIG=$(python3 config/models.py "$MODEL")
 
-        MODEL_DIR=$(echo "$CONFIG" | python3 -c "import sys,json; print(json.load(sys.stdin)['model_dir'])")
-        MODEL_REPO=$(echo "$CONFIG" | python3 -c "import sys,json; print(json.load(sys.stdin)['model_repo'])")
-        MODEL_FILE=$(echo "$CONFIG" | python3 -c "import sys,json; print(json.load(sys.stdin)['model_file'])")
-        N_CTX=$(echo "$CONFIG" | python3 -c "import sys,json; print(json.load(sys.stdin)['n_ctx'])")
-        N_THREADS=$(echo "$CONFIG" | python3 -c "import sys,json; print(json.load(sys.stdin)['n_threads'])")
-        N_BATCH=$(echo "$CONFIG" | python3 -c "import sys,json; print(json.load(sys.stdin)['n_batch'])")
-        MAX_CONCURRENT=$(echo "$CONFIG" | python3 -c "import sys,json; print(json.load(sys.stdin)['max_concurrent'])")
-        KV_CACHE_QUANT=$(echo "$CONFIG" | python3 -c "import sys,json; c=json.load(sys.stdin); print('true' if c['kv_cache_quant'] else 'false')")
-        FLASH_ATTN=$(echo "$CONFIG" | python3 -c "import sys,json; c=json.load(sys.stdin); print('true' if c['flash_attn'] else 'false')")
+        MODEL_DIR=$(echo "$CONFIG" | jq -r '.model_dir')
+        MODEL_REPO=$(echo "$CONFIG" | jq -r '.model_repo')
+        MODEL_FILE=$(echo "$CONFIG" | jq -r '.model_file')
+        N_CTX=$(echo "$CONFIG" | jq -r '.n_ctx')
+        N_THREADS=$(echo "$CONFIG" | jq -r '.n_threads')
+        N_BATCH=$(echo "$CONFIG" | jq -r '.n_batch')
+        MAX_CONCURRENT=$(echo "$CONFIG" | jq -r '.max_concurrent')
+        KV_CACHE_QUANT=$(echo "$CONFIG" | jq -r 'if .kv_cache_quant then "true" else "false" end')
+        FLASH_ATTN=$(echo "$CONFIG" | jq -r 'if .flash_attn then "true" else "false" end')
 
         echo "model_dir=$MODEL_DIR" >> $GITHUB_OUTPUT
         echo "model_repo=$MODEL_REPO" >> $GITHUB_OUTPUT

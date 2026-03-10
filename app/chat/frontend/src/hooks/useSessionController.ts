@@ -1,4 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
+
+const ICON_CLOCK = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="display: inline-block; vertical-align: text-bottom; margin-right: 6px;"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+const ICON_WARNING = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="display: inline-block; vertical-align: text-bottom; margin-right: 6px;"><path d="M12 2L2 20h20L12 2z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><path d="M12 9v4M12 17h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 import { GENERATION_DEFAULTS, isThinkingModel } from '../constants';
 import { fetchChatStream, streamSseEvents } from '../utils/streaming';
 import { ChatHistoryEntry, Mode, Model } from '../types';
@@ -183,7 +186,7 @@ export function useSessionController(params: SessionControllerParams) {
     const thinkingResetIds = new Set(sessionModelIds);
     if (moderator) thinkingResetIds.add(moderator);
     thinkingResetIds.forEach(modelId => {
-      const startsInThinkingMode = isThinkingModel(modelId);
+      const startsInThinkingMode = isThinkingModel(modelId, modelsData);
       thinkingStateRef.current[modelId] = {
         inThink: startsInThinkingMode,
         carry: '',
@@ -221,15 +224,11 @@ export function useSessionController(params: SessionControllerParams) {
     const addIconToMessage = (message: string): string => {
       const lowerMsg = message.toLowerCase();
       if (lowerMsg.includes('rate limit') || lowerMsg.includes('waiting')) {
-        const clockIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="display: inline-block; vertical-align: text-bottom; margin-right: 6px;"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-        return clockIcon + message;
+        return ICON_CLOCK + message;
       }
-
       if (lowerMsg.includes('error') || lowerMsg.includes('failed')) {
-        const warningIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="display: inline-block; vertical-align: text-bottom; margin-right: 6px;"><path d="M12 2L2 20h20L12 2z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><path d="M12 9v4M12 17h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-        return warningIcon + message;
+        return ICON_WARNING + message;
       }
-
       return message;
     };
 
@@ -422,18 +421,17 @@ export function useSessionController(params: SessionControllerParams) {
           recordResponse(modelId, errorText, { replace: true });
         }
 
-        if (eventType === 'analysis_complete') {
-          setPhaseLabel('Analysis Complete');
-          const consensus = event.consensus || [];
-          const unique = event.unique_contributions || {};
+        if (eventType === 'analyze_complete') {
+          const commonPhrases = event.commonPhrases || [];
+          const distinctPhrases = event.distinctPhrases || {};
 
           let analysis = 'Analysis:\nBased on shared vocabulary across responses\n\n';
-          if (consensus.length > 0) {
-            analysis += 'Shared phrasing:\n' + consensus.map((c: string) => `• ${c}`).join('\n') + '\n\n';
+          if (commonPhrases.length > 0) {
+            analysis += 'Shared phrasing:\n' + commonPhrases.map((c: string) => `• ${c}`).join('\n') + '\n\n';
           }
-          if (Object.keys(unique).length > 0) {
+          if (Object.keys(distinctPhrases).length > 0) {
             analysis += 'Unique phrasing:\n';
-            for (const [modelId, points] of Object.entries(unique)) {
+            for (const [modelId, points] of Object.entries(distinctPhrases)) {
               const modelName = modelIdToName(modelId);
               analysis += `\n${modelName}:\n` + (points as string[]).map((p: string) => `• ${p}`).join('\n') + '\n';
             }
@@ -443,9 +441,7 @@ export function useSessionController(params: SessionControllerParams) {
           if (moderator) {
             setModelsData(prev => prev.map(model => model.id === moderator ? { ...model, response: analysis } : model));
           }
-        }
 
-        if (eventType === 'analyze_complete') {
           setPhaseLabel('Complete');
           setSpeaking(new Set());
         }

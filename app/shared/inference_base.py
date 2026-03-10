@@ -15,6 +15,8 @@ import time
 from dataclasses import dataclass
 from typing import Optional, List
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -119,16 +121,21 @@ def create_app_for_model(model_name: str) -> FastAPI:
 
 
 def create_inference_app(config: ModelConfig) -> FastAPI:
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        _load_model()
+        yield
+
     app = FastAPI(
         title=config.title,
         description=config.description,
         version="1.0.0",
+        lifespan=lifespan,
     )
 
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
-        allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
@@ -193,10 +200,6 @@ def create_inference_app(config: ModelConfig) -> FastAPI:
             print("Model warm-up complete!")
         except Exception as e:
             print(f"Warm-up warning: {e}")
-
-    @app.on_event("startup")
-    async def _startup_event():
-        _load_model()
 
     @app.get("/health")
     async def health():

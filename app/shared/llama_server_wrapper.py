@@ -6,6 +6,7 @@ import os
 import signal
 import subprocess
 import time
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import List, Optional
 
@@ -52,15 +53,32 @@ def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
     hf_token = os.getenv("HF_TOKEN")
     startup_timeout = int(os.getenv("STARTUP_TIMEOUT", str(config.startup_timeout)))
 
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        nonlocal llama_process, http_client
+        check_llama_server()
+        model_path = download_model()
+        llama_process = start_llama_server(model_path)
+        http_client = httpx.AsyncClient(
+            base_url=f"http://127.0.0.1:{LLAMA_SERVER_PORT}",
+            timeout=300.0,
+        )
+        atexit.register(cleanup)
+        signal.signal(signal.SIGTERM, lambda s, f: cleanup())
+        yield
+        if http_client:
+            await http_client.aclose()
+        cleanup()
+
     app = FastAPI(
         title=f"{config.display_name} Inference API",
         description=f"REST API for {config.display_name} model inference using native llama.cpp",
+        lifespan=lifespan,
     )
 
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
-        allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
@@ -176,29 +194,6 @@ def create_llama_server_app(config: LlamaServerConfig) -> FastAPI:
                 llama_process.wait(timeout=5)
             except subprocess.TimeoutExpired:
                 llama_process.kill()
-
-    @app.on_event("startup")
-    async def startup():
-        nonlocal llama_process, http_client
-
-        check_llama_server()
-        model_path = download_model()
-        llama_process = start_llama_server(model_path)
-
-        http_client = httpx.AsyncClient(
-            base_url=f"http://127.0.0.1:{LLAMA_SERVER_PORT}",
-            timeout=300.0,
-        )
-
-        atexit.register(cleanup)
-        signal.signal(signal.SIGTERM, lambda s, f: cleanup())
-
-    @app.on_event("shutdown")
-    async def shutdown():
-        nonlocal http_client
-        if http_client:
-            await http_client.aclose()
-        cleanup()
 
     @app.get("/health")
     async def health():
