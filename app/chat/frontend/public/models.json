@@ -15,22 +15,8 @@
       "context_length": 4096
     },
     {
-      "id": "dasd-4b-thinking",
-      "name": "DASD-4B Thinking",
-      "type": "self-hosted",
-      "priority": 2,
-      "context_length": 4096
-    },
-    {
       "id": "smollm3-3b",
       "name": "SmolLM3 3B",
-      "type": "self-hosted",
-      "priority": 3,
-      "context_length": 4096
-    },
-    {
-      "id": "agentcpm-explore-4b",
-      "name": "AgentCPM-Explore 4B",
       "type": "self-hosted",
       "priority": 3,
       "context_length": 4096
@@ -131,6 +117,20 @@
       "name": "GPT-OSS 20B",
       "type": "self-hosted",
       "priority": 13,
+      "context_length": 4096
+    },
+    {
+      "id": "dasd-4b-thinking",
+      "name": "DASD-4B Thinking",
+      "type": "self-hosted",
+      "priority": 14,
+      "context_length": 4096
+    },
+    {
+      "id": "agentcpm-explore-4b",
+      "name": "AgentCPM-Explore 4B",
+      "type": "self-hosted",
+      "priority": 15,
       "context_length": 4096
     },
     {
@@ -696,6 +696,6 @@
       ]
     }
   ],
-  "fetchedAt": "2026-03-05T13:56:04.370Z",
+  "fetchedAt": "2026-03-10T15:22:48.143Z",
   "source": "build-time"
 }
