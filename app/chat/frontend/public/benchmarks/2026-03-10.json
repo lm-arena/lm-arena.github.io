@@ -2,7 +2,7 @@
   "lfm2thinking": {
     "model": "lfm2thinking",
     "date": "2026-03-10",
-    "run_at": "2026-03-10T16:20:01.784855+00:00",
+    "run_at": "2026-03-10T16:27:13.499556+00:00",
     "suites": {
       "mmlu": {
         "prompts": 10,
