@@ -223,8 +223,15 @@ def write_results(today, all_results):
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     run_file = OUT_DIR / f"{today}.json"
-    run_file.write_text(json.dumps(all_results, indent=2))
-    print(f"\nResults written to {run_file}")
+    existing = {}
+    if run_file.exists():
+        try:
+            existing = json.loads(run_file.read_text())
+        except Exception:
+            pass
+    existing.update(all_results)
+    run_file.write_text(json.dumps(existing, indent=2))
+    print(f"\nResults written to {run_file} ({len(existing)} models total)")
 
     index_file = OUT_DIR / "index.json"
     runs = []
