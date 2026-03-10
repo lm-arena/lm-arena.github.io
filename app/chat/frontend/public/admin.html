@@ -395,7 +395,7 @@
   }
 
   async function stopAll() {
-    await Promise.all(MODELS.filter(m => runMap[m.key]).map(m => stopModel(m.key)));
+    await Promise.all(MODELS.filter(m => tunnelMap[m.key]).map(m => stopModel(m.key)));
   }
 
   function schedulePoll() {
