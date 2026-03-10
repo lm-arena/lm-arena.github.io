@@ -126,12 +126,15 @@ jobs:
       - name: Compute build config
         id: config
         run: |
-          LLAMA_SERVER_MODELS="rnj-inference lfm2-inference lfm2mini-inference lfm2thinking-inference falcon-inference"
+          LLAMA_SERVER_MODELS="rnj-inference lfm2-inference lfm2mini-inference lfm2thinking-inference falcon-inference qwen-inference"
+          # Pinned llama.cpp release: update when new architecture support is needed
+          LLAMA_COMMIT="b8261"
           MODEL="${{ matrix.model }}"
           if echo "$LLAMA_SERVER_MODELS" | grep -qw "$MODEL"; then
             DOCKERFILE="./app/shared/Dockerfile.llama-server"
             CONTEXT="."
-            BUILD_ARGS="MODEL_DIR=$MODEL"
+            BUILD_ARGS="MODEL_DIR=$MODEL
+LLAMA_COMMIT=$LLAMA_COMMIT"
           else
             DOCKERFILE="./app/shared/Dockerfile.inference"
             CONTEXT="."

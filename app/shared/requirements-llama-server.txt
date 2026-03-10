@@ -1,6 +1,6 @@
-# Requirements for llama-server wrapper models (rnj, lfm2)
+# Requirements for llama-server wrapper models (rnj, qwen, lfm2, falcon)
 # These models run llama-server directly instead of llama-cpp-python bindings
-# due to architecture-specific requirements (rnj1, lfm2)
+# because their architectures require a newer llama.cpp than llama-cpp-python ships
 
 fastapi>=0.104.1
 uvicorn[standard]>=0.24.0
