@@ -342,7 +342,7 @@
         <div class="trace-meta">
           ${t.timed_out
             ? `<span class="badge badge-offline">timeout</span>`
-            : !t.responded
+            : t.responded === false
             ? `<span class="badge badge-offline">empty</span>`
             : `<span class="badge ${t.correct ? 'badge-pass' : 'badge-fail'}">${t.correct ? 'pass' : 'fail'}</span>`}
           <span>expected: <span style="font-family:var(--font-mono)">${escHtml(t.expected)}</span></span>
