@@ -20,6 +20,7 @@ def main():
     local_models = [
         {
             "id": m.model_id,
+            "key": m.name,
             "name": m.display_name,
             "type": "self-hosted",
             "priority": m.rank,

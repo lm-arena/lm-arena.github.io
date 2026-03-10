@@ -2,6 +2,7 @@
   "models": [
     {
       "id": "nanbeige4.1-3b",
+      "key": "nanbeige",
       "name": "Nanbeige4.1-3B",
       "type": "self-hosted",
       "priority": 1,
@@ -9,6 +10,7 @@
     },
     {
       "id": "qwen3.5-4b",
+      "key": "qwen",
       "name": "Qwen3.5 4B",
       "type": "self-hosted",
       "priority": 2,
@@ -16,6 +18,7 @@
     },
     {
       "id": "smollm3-3b",
+      "key": "smollm3",
       "name": "SmolLM3 3B",
       "type": "self-hosted",
       "priority": 3,
@@ -23,6 +26,7 @@
     },
     {
       "id": "lfm2.5-1.2b-instruct",
+      "key": "lfm2",
       "name": "LFM2.5 1.2B",
       "type": "self-hosted",
       "priority": 4,
@@ -30,6 +34,7 @@
     },
     {
       "id": "phi-4-mini-reasoning",
+      "key": "phireasoning",
       "name": "Phi-4 Mini Reasoning",
       "type": "self-hosted",
       "priority": 4,
@@ -37,6 +42,7 @@
     },
     {
       "id": "lfm2.5-1.2b-thinking",
+      "key": "lfm2thinking",
       "name": "LFM2.5 1.2B Thinking",
       "type": "self-hosted",
       "priority": 5,
@@ -44,6 +50,7 @@
     },
     {
       "id": "gemma-3n-e4b-it",
+      "key": "gemma3n",
       "name": "Gemma 3n E4B",
       "type": "self-hosted",
       "priority": 5,
@@ -51,6 +58,7 @@
     },
     {
       "id": "deepseek-r1-distill-qwen-1.5b",
+      "key": "r1qwen",
       "name": "DeepSeek R1 1.5B",
       "type": "self-hosted",
       "priority": 5,
@@ -58,6 +66,7 @@
     },
     {
       "id": "lfm2-350m",
+      "key": "lfm2mini",
       "name": "LFM2 350M",
       "type": "self-hosted",
       "priority": 6,
@@ -65,6 +74,7 @@
     },
     {
       "id": "gemma-3-12b-it",
+      "key": "gemma",
       "name": "Gemma 3 12B",
       "type": "self-hosted",
       "priority": 6,
@@ -72,6 +82,7 @@
     },
     {
       "id": "falcon-h1r-7b",
+      "key": "falcon",
       "name": "Falcon H1R 7B",
       "type": "self-hosted",
       "priority": 7,
@@ -79,6 +90,7 @@
     },
     {
       "id": "jan-code-4b",
+      "key": "jancode",
       "name": "Jan-code 4B",
       "type": "self-hosted",
       "priority": 8,
@@ -86,6 +98,7 @@
     },
     {
       "id": "phi-4-mini",
+      "key": "phi",
       "name": "Phi-4 Mini",
       "type": "self-hosted",
       "priority": 9,
@@ -93,6 +106,7 @@
     },
     {
       "id": "rnj-1-instruct",
+      "key": "rnj",
       "name": "RNJ-1 Instruct",
       "type": "self-hosted",
       "priority": 9,
@@ -100,6 +114,7 @@
     },
     {
       "id": "llama-3.2-3b",
+      "key": "llama",
       "name": "Llama 3.2-3B",
       "type": "self-hosted",
       "priority": 10,
@@ -107,6 +122,7 @@
     },
     {
       "id": "functiongemma-270m-it",
+      "key": "functiongemma",
       "name": "FunctionGemma 270M",
       "type": "self-hosted",
       "priority": 12,
@@ -114,6 +130,7 @@
     },
     {
       "id": "gpt-oss-20b",
+      "key": "gptoss",
       "name": "GPT-OSS 20B",
       "type": "self-hosted",
       "priority": 13,
@@ -121,6 +138,7 @@
     },
     {
       "id": "dasd-4b-thinking",
+      "key": "dasd",
       "name": "DASD-4B Thinking",
       "type": "self-hosted",
       "priority": 14,
@@ -128,6 +146,7 @@
     },
     {
       "id": "agentcpm-explore-4b",
+      "key": "agentcpm",
       "name": "AgentCPM-Explore 4B",
       "type": "self-hosted",
       "priority": 15,
