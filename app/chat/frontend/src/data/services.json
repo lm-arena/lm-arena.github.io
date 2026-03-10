@@ -17,27 +17,11 @@
       "rank": 2
     },
     {
-      "key": "dasd",
-      "name": "DASD-4B Thinking",
-      "localPort": 8106,
-      "category": "small",
-      "modelId": "dasd-4b-thinking",
-      "rank": 2
-    },
-    {
       "key": "smollm3",
       "name": "SmolLM3 3B",
       "localPort": 8104,
       "category": "small",
       "modelId": "smollm3-3b",
-      "rank": 3
-    },
-    {
-      "key": "agentcpm",
-      "name": "AgentCPM-Explore 4B",
-      "localPort": 8107,
-      "category": "small",
-      "modelId": "agentcpm-explore-4b",
       "rank": 3
     },
     {
@@ -151,6 +135,22 @@
       "category": "reasoning",
       "modelId": "gpt-oss-20b",
       "rank": 13
+    },
+    {
+      "key": "dasd",
+      "name": "DASD-4B Thinking",
+      "localPort": 8106,
+      "category": "small",
+      "modelId": "dasd-4b-thinking",
+      "rank": 14
+    },
+    {
+      "key": "agentcpm",
+      "name": "AgentCPM-Explore 4B",
+      "localPort": 8107,
+      "category": "small",
+      "modelId": "agentcpm-explore-4b",
+      "rank": 15
     }
   ]
 }
