@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: write
     steps:
       - uses: actions/checkout@v4
 
@@ -32,3 +33,10 @@ jobs:
           git diff --cached --quiet || git commit -m "chore: benchmark results $(date -u +%Y-%m-%d)"
           git pull --rebase origin main
           git push
+
+      - name: Trigger deploy
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run deploy.yml --ref main
+          echo "✓ Deploy triggered"
