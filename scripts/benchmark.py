@@ -60,7 +60,7 @@ INSTRUCT_PROMPTS = [
     ("Respond with exactly one word: the opposite of hot.", "cold"),
     ("Respond with exactly one word: the first month of the year.", "january"),
     ("Respond with exactly one word: the number of days in a week.", "7"),
-    ("Respond with exactly the answer, nothing else: 2 + 2 =", "4"),
+    ("Respond with exactly one word: what is 2 + 2?", "4"),
     ("Respond with exactly one word: what metal is used in electrical wires?", "copper"),
     ("Respond with exactly one word: the largest ocean.", "pacific"),
     ("Respond with exactly one word: what do bees produce?", "honey"),
