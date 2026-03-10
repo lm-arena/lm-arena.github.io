@@ -28,7 +28,7 @@ function isAuthorized(request, env) {
 // Validate a GitHub token by checking push access to this repo
 async function isGitHubAdmin(token) {
   try {
-    const res = await fetch('https://api.github.com/repos/jonasneves/lm-arena', {
+    const res = await fetch('https://api.github.com/repos/lm-arena/lm-arena.github.io', {
       headers: { Authorization: `Bearer ${token}`, 'User-Agent': 'lm-arena-worker' },
     });
     if (!res.ok) return false;
