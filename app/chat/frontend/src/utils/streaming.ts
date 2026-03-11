@@ -264,6 +264,29 @@ export async function* readSseStream(
         }
       }
     }
+
+    // Flush any remaining content in the buffer that arrived without a trailing newline.
+    const remaining = buffer.trim();
+    if (remaining.startsWith('data: ')) {
+      const data = remaining.slice(6);
+      if (data === '[DONE]') {
+        yield { type: 'done' };
+      } else {
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.error) {
+            yield { type: 'error', error: String(parsed.error) };
+          } else {
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) {
+              yield { type: 'chunk', content };
+            }
+          }
+        } catch {
+          // Skip malformed JSON
+        }
+      }
+    }
   } finally {
     reader.releaseLock();
   }

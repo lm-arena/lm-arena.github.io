@@ -376,7 +376,7 @@
             <div class="model-cell">
               ${modelIcon(meta.owned_by)}
               <div>
-                <div class="model-name">${meta.name ?? m.model}${offline ? ' <span class="badge badge-offline">not responding</span>' : ''}</div>
+                <div class="model-name">${escHtml(meta.name ?? m.model)}${offline ? ' <span class="badge badge-offline">not responding</span>' : ''}</div>
                 ${meta.description ? `<div class="model-sub">${escHtml(meta.description)}</div>` : ''}
               </div>
             </div>
@@ -411,7 +411,7 @@
             <div class="model-cell">
               ${modelIcon(meta.owned_by)}
               <div>
-                <div class="model-name">${meta.name ?? m.model}${offline ? ' <span class="badge badge-offline">not responding</span>' : ''}</div>
+                <div class="model-name">${escHtml(meta.name ?? m.model)}${offline ? ' <span class="badge badge-offline">not responding</span>' : ''}</div>
                 ${meta.description ? `<div class="model-sub">${escHtml(meta.description)}</div>` : ''}
               </div>
             </div>

@@ -402,7 +402,7 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
         });
 
         await Promise.allSettled(streamPromises);
-    }, [isGenerating, selectedModels, modelMap, githubToken, uiBuilderEnabled, setMessages, setIsGenerating, syncStreamingState, getModelEndpoints, models]);
+    }, [isGenerating, selectedModels, modelMap, githubToken, uiBuilderEnabled, setMessages, setIsGenerating, syncStreamingState, getModelEndpoints, models, modelKeyMap]);
 
     const stopGeneration = useCallback(() => {
         abortRefs.current.forEach(c => c.abort());

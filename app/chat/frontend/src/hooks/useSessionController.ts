@@ -498,6 +498,7 @@ export function useSessionController(params: SessionControllerParams) {
           const modelId = event.model_id;
           const turnNum = event.turn_number ?? 0;
           const roundNum = event.round_number ?? 0;
+          firstTokenReceived.delete(modelId);
           setSpeaking(new Set([modelId]));
           setPhaseLabel(`Round ${roundNum + 1} · Turn ${turnNum + 1}`);
           currentDiscussionTurnRef.current = { modelId, turnNumber: turnNum };
