@@ -23,6 +23,17 @@
       "routing_category": "general"
     },
     {
+      "id": "qwen3.5-27b-claude-distilled",
+      "key": "qwenclaude27b",
+      "name": "Qwen3.5-27B Claude Distilled",
+      "type": "self-hosted",
+      "priority": 2,
+      "context_length": 8192,
+      "owned_by": "jackrong",
+      "description": "27B reasoning distilled from Claude 4.6 Opus, preserved thinking mode, strong agentic capabilities",
+      "routing_category": "reasoning"
+    },
+    {
       "id": "smollm3-3b",
       "key": "smollm3",
       "name": "SmolLM3 3B",
@@ -78,17 +89,6 @@
       "routing_category": "general"
     },
     {
-      "id": "deepseek-r1-distill-qwen-1.5b",
-      "key": "r1qwen",
-      "name": "DeepSeek R1 1.5B",
-      "type": "self-hosted",
-      "priority": 5,
-      "context_length": 4096,
-      "owned_by": "deepseek",
-      "description": "Math reasoning (83.9% MATH-500), Codeforces 954 rating",
-      "routing_category": "reasoning"
-    },
-    {
       "id": "lfm2-350m",
       "key": "lfm2mini",
       "name": "LFM2 350M",
@@ -96,18 +96,7 @@
       "priority": 6,
       "context_length": 8192,
       "owned_by": "liquidai",
-      "description": "255 tok/s on Jetson, 33ms TTFT, 229MB \u2014 fastest model in the arena",
-      "routing_category": "general"
-    },
-    {
-      "id": "gemma-3-12b-it",
-      "key": "gemma",
-      "name": "Gemma 3 12B",
-      "type": "self-hosted",
-      "priority": 6,
-      "context_length": 8192,
-      "owned_by": "google",
-      "description": "Gemma 3 IT, stronger instruction-following and safety with ~8K context",
+      "description": "255 tok/s on Jetson, 33ms TTFT, 229MB — fastest model in the arena",
       "routing_category": "general"
     },
     {
@@ -133,14 +122,14 @@
       "routing_category": "coding"
     },
     {
-      "id": "phi-4-mini",
-      "key": "phi",
-      "name": "Phi-4 Mini",
+      "id": "qwen3.5-7b",
+      "key": "qwen7b",
+      "name": "Qwen3.5 7B",
       "type": "self-hosted",
-      "priority": 9,
-      "context_length": 8192,
-      "owned_by": "microsoft",
-      "description": "128K context, 22 languages, function calling, strong math (GSM8K 88.6%)",
+      "priority": 8,
+      "context_length": 4096,
+      "owned_by": "qwen",
+      "description": "Multilingual (201 langs), 256K context, thinking mode, Apache 2.0",
       "routing_category": "general"
     },
     {
@@ -155,28 +144,6 @@
       "routing_category": "function_calling"
     },
     {
-      "id": "llama-3.2-3b",
-      "key": "llama",
-      "name": "Llama 3.2-3B",
-      "type": "self-hosted",
-      "priority": 10,
-      "context_length": 4096,
-      "owned_by": "meta",
-      "description": "MMLU 63.4%, 128K context, multilingual",
-      "routing_category": "general"
-    },
-    {
-      "id": "functiongemma-270m-it",
-      "key": "functiongemma",
-      "name": "FunctionGemma 270M",
-      "type": "self-hosted",
-      "priority": 12,
-      "context_length": 4096,
-      "owned_by": "google",
-      "description": "Function calling specialist, edge-optimized (50 t/s on Pixel 8)",
-      "routing_category": "function_calling"
-    },
-    {
       "id": "gpt-oss-20b",
       "key": "gptoss",
       "name": "GPT-OSS 20B",
@@ -188,27 +155,568 @@
       "routing_category": "function_calling"
     },
     {
-      "id": "dasd-4b-thinking",
-      "key": "dasd",
-      "name": "DASD-4B Thinking",
-      "type": "self-hosted",
-      "priority": 14,
-      "context_length": 4096,
-      "owned_by": "alibaba-apsara",
-      "description": "Reasoning model with thinking capabilities from Alibaba-Apsara",
-      "routing_category": "reasoning"
+      "id": "openai/gpt-4.1",
+      "name": "OpenAI GPT-4.1",
+      "type": "api",
+      "priority": 1,
+      "context_length": 1048576,
+      "publisher": "OpenAI",
+      "summary": "gpt-4.1 outperforms gpt-4o across the board, with major gains in coding, instruction following, and long-context understanding",
+      "capabilities": [
+        "agents",
+        "streaming",
+        "tool-calling",
+        "agentsV2"
+      ]
     },
     {
-      "id": "agentcpm-explore-4b",
-      "key": "agentcpm",
-      "name": "AgentCPM-Explore 4B",
-      "type": "self-hosted",
+      "id": "openai/gpt-4.1-mini",
+      "name": "OpenAI GPT-4.1-mini",
+      "type": "api",
+      "priority": 2,
+      "context_length": 1048576,
+      "publisher": "OpenAI",
+      "summary": "gpt-4.1-mini outperform gpt-4o-mini across the board, with major gains in coding, instruction following, and long-context handling",
+      "capabilities": [
+        "agents",
+        "streaming",
+        "tool-calling",
+        "agentsV2"
+      ]
+    },
+    {
+      "id": "openai/gpt-4.1-nano",
+      "name": "OpenAI GPT-4.1-nano",
+      "type": "api",
+      "priority": 3,
+      "context_length": 1048576,
+      "publisher": "OpenAI",
+      "summary": "gpt-4.1-nano provides gains in coding, instruction following, and long-context handling along with lower latency and cost",
+      "capabilities": [
+        "agents",
+        "streaming",
+        "tool-calling",
+        "agentsV2"
+      ]
+    },
+    {
+      "id": "openai/gpt-4o",
+      "name": "OpenAI GPT-4o",
+      "type": "api",
+      "priority": 4,
+      "context_length": 131072,
+      "publisher": "OpenAI",
+      "summary": "OpenAI's most advanced multimodal model in the gpt-4o family. Can handle both text and image inputs.",
+      "capabilities": [
+        "agents",
+        "assistants",
+        "streaming",
+        "tool-calling",
+        "agentsV2"
+      ]
+    },
+    {
+      "id": "openai/gpt-4o-mini",
+      "name": "OpenAI GPT-4o mini",
+      "type": "api",
+      "priority": 5,
+      "context_length": 131072,
+      "publisher": "OpenAI",
+      "summary": "An affordable, efficient AI solution for diverse text and image tasks.",
+      "capabilities": [
+        "agents",
+        "assistants",
+        "streaming",
+        "tool-calling",
+        "agentsV2"
+      ]
+    },
+    {
+      "id": "openai/gpt-5",
+      "name": "OpenAI gpt-5",
+      "type": "api",
+      "priority": 6,
+      "context_length": 200000,
+      "publisher": "OpenAI",
+      "summary": "gpt-5 is designed for logic-heavy and multi-step tasks. ",
+      "capabilities": [
+        "agents",
+        "agentsV2",
+        "reasoning",
+        "tool-calling",
+        "streaming"
+      ]
+    },
+    {
+      "id": "openai/gpt-5-chat",
+      "name": "OpenAI gpt-5-chat (preview)",
+      "type": "api",
+      "priority": 7,
+      "context_length": 200000,
+      "publisher": "OpenAI",
+      "summary": "gpt-5-chat (preview) is an advanced, natural, multimodal, and context-aware conversations for enterprise applications.",
+      "capabilities": [
+        "agents",
+        "agentsV2",
+        "reasoning",
+        "tool-calling",
+        "streaming"
+      ]
+    },
+    {
+      "id": "openai/gpt-5-mini",
+      "name": "OpenAI gpt-5-mini",
+      "type": "api",
+      "priority": 8,
+      "context_length": 200000,
+      "publisher": "OpenAI",
+      "summary": "gpt-5-mini is a lightweight version for cost-sensitive applications.",
+      "capabilities": [
+        "agents",
+        "agentsV2",
+        "reasoning",
+        "tool-calling",
+        "streaming"
+      ]
+    },
+    {
+      "id": "openai/gpt-5-nano",
+      "name": "OpenAI gpt-5-nano",
+      "type": "api",
+      "priority": 9,
+      "context_length": 200000,
+      "publisher": "OpenAI",
+      "summary": "gpt-5-nano is optimized for speed, ideal for applications requiring low latency. ",
+      "capabilities": [
+        "agents",
+        "agentsV2",
+        "reasoning",
+        "tool-calling",
+        "streaming"
+      ]
+    },
+    {
+      "id": "openai/o1",
+      "name": "OpenAI o1",
+      "type": "api",
+      "priority": 10,
+      "context_length": 200000,
+      "publisher": "OpenAI",
+      "summary": "Focused on advanced reasoning and solving complex problems, including math and science tasks. Ideal for applications that require deep contextual understanding and agentic workflows.",
+      "capabilities": [
+        "agents",
+        "reasoning",
+        "tool-calling",
+        "agentsV2"
+      ]
+    },
+    {
+      "id": "openai/o1-mini",
+      "name": "OpenAI o1-mini",
+      "type": "api",
+      "priority": 11,
+      "context_length": 128000,
+      "publisher": "OpenAI",
+      "summary": "Smaller, faster, and 80% cheaper than o1-preview, performs well at code generation and small context operations.",
+      "capabilities": [
+        "reasoning",
+        "streaming",
+        "agentsV2"
+      ]
+    },
+    {
+      "id": "openai/o1-preview",
+      "name": "OpenAI o1-preview",
+      "type": "api",
+      "priority": 12,
+      "context_length": 128000,
+      "publisher": "OpenAI",
+      "summary": "Focused on advanced reasoning and solving complex problems, including math and science tasks. Ideal for applications that require deep contextual understanding and agentic workflows.",
+      "capabilities": [
+        "agentsV2",
+        "reasoning"
+      ]
+    },
+    {
+      "id": "openai/o3",
+      "name": "OpenAI o3",
+      "type": "api",
+      "priority": 13,
+      "context_length": 200000,
+      "publisher": "OpenAI",
+      "summary": "o3 includes significant improvements on quality and safety while supporting the existing features of o1 and delivering comparable or better performance.",
+      "capabilities": [
+        "agents",
+        "agentsV2",
+        "reasoning",
+        "streaming",
+        "tool-calling"
+      ]
+    },
+    {
+      "id": "openai/o3-mini",
+      "name": "OpenAI o3-mini",
+      "type": "api",
+      "priority": 14,
+      "context_length": 200000,
+      "publisher": "OpenAI",
+      "summary": "o3-mini includes the o1 features with significant cost-efficiencies for scenarios requiring high performance.",
+      "capabilities": [
+        "agents",
+        "reasoning",
+        "streaming",
+        "tool-calling",
+        "agentsV2"
+      ]
+    },
+    {
+      "id": "openai/o4-mini",
+      "name": "OpenAI o4-mini",
+      "type": "api",
       "priority": 15,
-      "context_length": 4096,
-      "owned_by": "openbmb",
-      "description": "Agentic exploration model for autonomous task execution",
-      "routing_category": "function_calling"
+      "context_length": 200000,
+      "publisher": "OpenAI",
+      "summary": "o4-mini includes significant improvements on quality and safety while supporting the existing features of o3-mini and delivering comparable or better performance.",
+      "capabilities": [
+        "agents",
+        "agentsV2",
+        "reasoning",
+        "tool-calling",
+        "streaming"
+      ]
+    },
+    {
+      "id": "ai21-labs/ai21-jamba-1.5-large",
+      "name": "AI21 Jamba 1.5 Large",
+      "type": "api",
+      "priority": 16,
+      "context_length": 262144,
+      "publisher": "AI21 Labs",
+      "summary": "A 398B parameters (94B active) multilingual model, offering a 256K long context window, function calling, structured output, and grounded generation.",
+      "capabilities": [
+        "streaming",
+        "tool-calling"
+      ]
+    },
+    {
+      "id": "cohere/cohere-command-a",
+      "name": "Cohere Command A",
+      "type": "api",
+      "priority": 17,
+      "context_length": 131072,
+      "publisher": "Cohere",
+      "summary": "Command A is a highly efficient generative model that excels at agentic and multilingual use cases.",
+      "capabilities": []
+    },
+    {
+      "id": "cohere/cohere-command-r-08-2024",
+      "name": "Cohere Command R 08-2024",
+      "type": "api",
+      "priority": 18,
+      "context_length": 131072,
+      "publisher": "Cohere",
+      "summary": "Command R is a scalable generative model targeting RAG and Tool Use to enable production-scale AI for enterprise.",
+      "capabilities": [
+        "streaming"
+      ]
+    },
+    {
+      "id": "cohere/cohere-command-r-plus-08-2024",
+      "name": "Cohere Command R+ 08-2024",
+      "type": "api",
+      "priority": 19,
+      "context_length": 131072,
+      "publisher": "Cohere",
+      "summary": "Command R+ is a state-of-the-art RAG-optimized model designed to tackle enterprise-grade workloads.",
+      "capabilities": [
+        "streaming",
+        "tool-calling"
+      ]
+    },
+    {
+      "id": "deepseek/deepseek-r1",
+      "name": "DeepSeek-R1",
+      "type": "api",
+      "priority": 20,
+      "context_length": 128000,
+      "publisher": "DeepSeek",
+      "summary": "DeepSeek-R1 excels at reasoning tasks using a step-by-step training process, such as language, scientific reasoning, and coding tasks.",
+      "capabilities": [
+        "reasoning",
+        "streaming",
+        "tool-calling"
+      ]
+    },
+    {
+      "id": "deepseek/deepseek-r1-0528",
+      "name": "DeepSeek-R1-0528",
+      "type": "api",
+      "priority": 21,
+      "context_length": 128000,
+      "publisher": "DeepSeek",
+      "summary": "The DeepSeek R1 0528 model has improved reasoning capabilities, this version also offers a reduced hallucination rate, enhanced support for function calling, and better experience for vibe coding.",
+      "capabilities": [
+        "agentsV2",
+        "reasoning",
+        "streaming",
+        "tool-calling"
+      ]
+    },
+    {
+      "id": "deepseek/deepseek-v3-0324",
+      "name": "DeepSeek-V3-0324",
+      "type": "api",
+      "priority": 22,
+      "context_length": 128000,
+      "publisher": "DeepSeek",
+      "summary": "DeepSeek-V3-0324 demonstrates notable improvements over its predecessor, DeepSeek-V3, in several key aspects, including enhanced reasoning, improved function calling, and superior code generation capabilities.",
+      "capabilities": [
+        "agentsV2",
+        "streaming",
+        "tool-calling"
+      ]
+    },
+    {
+      "id": "meta/llama-3.2-11b-vision-instruct",
+      "name": "Llama-3.2-11B-Vision-Instruct",
+      "type": "api",
+      "priority": 23,
+      "context_length": 128000,
+      "publisher": "Meta",
+      "summary": "Excels in image reasoning capabilities on high-res images for visual understanding apps.",
+      "capabilities": [
+        "streaming"
+      ]
+    },
+    {
+      "id": "meta/llama-3.2-90b-vision-instruct",
+      "name": "Llama-3.2-90B-Vision-Instruct",
+      "type": "api",
+      "priority": 24,
+      "context_length": 128000,
+      "publisher": "Meta",
+      "summary": "Advanced image reasoning capabilities for visual understanding agentic apps.",
+      "capabilities": [
+        "streaming"
+      ]
+    },
+    {
+      "id": "meta/llama-3.3-70b-instruct",
+      "name": "Llama-3.3-70B-Instruct",
+      "type": "api",
+      "priority": 25,
+      "context_length": 128000,
+      "publisher": "Meta",
+      "summary": "Llama 3.3 70B Instruct offers enhanced reasoning, math, and instruction following with performance comparable to Llama 3.1 405B.",
+      "capabilities": [
+        "agentsV2",
+        "streaming"
+      ]
+    },
+    {
+      "id": "meta/llama-4-maverick-17b-128e-instruct-fp8",
+      "name": "Llama 4 Maverick 17B 128E Instruct FP8",
+      "type": "api",
+      "priority": 26,
+      "context_length": 1000000,
+      "publisher": "Meta",
+      "summary": "Llama 4 Maverick 17B 128E Instruct FP8 is great at precise image understanding and creative writing, offering high quality at a lower price compared to Llama 3.3 70B",
+      "capabilities": [
+        "agents",
+        "agentsV2",
+        "assistants",
+        "streaming",
+        "tool-calling"
+      ]
+    },
+    {
+      "id": "meta/llama-4-scout-17b-16e-instruct",
+      "name": "Llama 4 Scout 17B 16E Instruct",
+      "type": "api",
+      "priority": 27,
+      "context_length": 10000000,
+      "publisher": "Meta",
+      "summary": "Llama 4 Scout 17B 16E Instruct is great at multi-document summarization, parsing extensive user activity for personalized tasks, and reasoning over vast codebases.",
+      "capabilities": [
+        "agents",
+        "assistants",
+        "streaming",
+        "tool-calling"
+      ]
+    },
+    {
+      "id": "meta/meta-llama-3.1-405b-instruct",
+      "name": "Meta-Llama-3.1-405B-Instruct",
+      "type": "api",
+      "priority": 28,
+      "context_length": 131072,
+      "publisher": "Meta",
+      "summary": "The Llama 3.1 instruction tuned text only models are optimized for multilingual dialogue use cases and outperform many of the available open source and closed chat models on common industry benchmarks.",
+      "capabilities": [
+        "agents"
+      ]
+    },
+    {
+      "id": "meta/meta-llama-3.1-8b-instruct",
+      "name": "Meta-Llama-3.1-8B-Instruct",
+      "type": "api",
+      "priority": 29,
+      "context_length": 131072,
+      "publisher": "Meta",
+      "summary": "The Llama 3.1 instruction tuned text only models are optimized for multilingual dialogue use cases and outperform many of the available open source and closed chat models on common industry benchmarks.",
+      "capabilities": [
+        "streaming"
+      ]
+    },
+    {
+      "id": "mistral-ai/codestral-2501",
+      "name": "Codestral 25.01",
+      "type": "api",
+      "priority": 30,
+      "context_length": 256000,
+      "publisher": "Mistral AI",
+      "summary": "Codestral 25.01 by Mistral AI is designed for code generation, supporting 80+ programming languages, and optimized for tasks like code completion and fill-in-the-middle",
+      "capabilities": [
+        "streaming"
+      ]
+    },
+    {
+      "id": "mistral-ai/ministral-3b",
+      "name": "Ministral 3B",
+      "type": "api",
+      "priority": 31,
+      "context_length": 131072,
+      "publisher": "Mistral AI",
+      "summary": "Ministral 3B is a state-of-the-art Small Language Model (SLM) optimized for edge computing and on-device applications. As it is designed for low-latency and compute-efficient inference, it it also the perfect model for standard GenAI applications that have",
+      "capabilities": [
+        "streaming",
+        "tool-calling"
+      ]
+    },
+    {
+      "id": "mistral-ai/mistral-medium-2505",
+      "name": "Mistral Medium 3 (25.05)",
+      "type": "api",
+      "priority": 32,
+      "context_length": 128000,
+      "publisher": "Mistral AI",
+      "summary": "Mistral Medium 3 is an advanced Large Language Model (LLM) with state-of-the-art reasoning, knowledge, coding and vision capabilities.",
+      "capabilities": [
+        "streaming",
+        "tool-calling"
+      ]
+    },
+    {
+      "id": "mistral-ai/mistral-small-2503",
+      "name": "Mistral Small 3.1",
+      "type": "api",
+      "priority": 33,
+      "context_length": 128000,
+      "publisher": "Mistral AI",
+      "summary": "Enhanced Mistral Small 3 with multimodal capabilities and a 128k context length.",
+      "capabilities": [
+        "agents",
+        "assistants",
+        "streaming",
+        "tool-calling"
+      ]
+    },
+    {
+      "id": "xai/grok-3",
+      "name": "Grok 3",
+      "type": "api",
+      "priority": 34,
+      "context_length": 131072,
+      "publisher": "xAI",
+      "summary": "Grok 3 is xAI's debut model, pretrained by Colossus at supermassive scale to excel in specialized domains like finance, healthcare, and the law.",
+      "capabilities": [
+        "agentsV2"
+      ]
+    },
+    {
+      "id": "xai/grok-3-mini",
+      "name": "Grok 3 Mini",
+      "type": "api",
+      "priority": 35,
+      "context_length": 131072,
+      "publisher": "xAI",
+      "summary": "Grok 3 Mini is a lightweight model that thinks before responding. Trained on mathematic and scientific problems, it is great for logic-based tasks.",
+      "capabilities": [
+        "agentsV2"
+      ]
+    },
+    {
+      "id": "microsoft/mai-ds-r1",
+      "name": "MAI-DS-R1",
+      "type": "api",
+      "priority": 36,
+      "context_length": 128000,
+      "publisher": "Microsoft",
+      "summary": "MAI-DS-R1 is a DeepSeek-R1 reasoning model that has been post-trained by the Microsoft AI team to fill in information gaps in the previous version of the model and improve its harm protections while maintaining R1 reasoning capabilities.",
+      "capabilities": [
+        "agentsV2",
+        "reasoning",
+        "streaming"
+      ]
+    },
+    {
+      "id": "microsoft/phi-4",
+      "name": "Phi-4",
+      "type": "api",
+      "priority": 37,
+      "context_length": 16384,
+      "publisher": "Microsoft",
+      "summary": "Phi-4 14B, a highly capable model for low latency scenarios.",
+      "capabilities": []
+    },
+    {
+      "id": "microsoft/phi-4-mini-instruct",
+      "name": "Phi-4-mini-instruct",
+      "type": "api",
+      "priority": 38,
+      "context_length": 128000,
+      "publisher": "Microsoft",
+      "summary": "3.8B parameters Small Language Model outperforming larger models in reasoning, math, coding, and function-calling",
+      "capabilities": []
+    },
+    {
+      "id": "microsoft/phi-4-mini-reasoning",
+      "name": "Phi-4-mini-reasoning",
+      "type": "api",
+      "priority": 39,
+      "context_length": 128000,
+      "publisher": "Microsoft",
+      "summary": "Lightweight math reasoning model optimized for multi-step problem solving",
+      "capabilities": [
+        "reasoning"
+      ]
+    },
+    {
+      "id": "microsoft/phi-4-multimodal-instruct",
+      "name": "Phi-4-multimodal-instruct",
+      "type": "api",
+      "priority": 40,
+      "context_length": 128000,
+      "publisher": "Microsoft",
+      "summary": "First small multimodal model to have 3 modality inputs (text, audio, image), excelling in quality and efficiency",
+      "capabilities": [
+        "streaming"
+      ]
+    },
+    {
+      "id": "microsoft/phi-4-reasoning",
+      "name": "Phi-4-reasoning",
+      "type": "api",
+      "priority": 41,
+      "context_length": 32768,
+      "publisher": "Microsoft",
+      "summary": "State-of-the-art open-weight reasoning model.",
+      "capabilities": [
+        "reasoning",
+        "streaming"
+      ]
     }
   ],
-  "source": "config/models.py"
+  "fetchedAt": "2026-03-11T23:24:04.638Z",
+  "source": "build-time"
 }

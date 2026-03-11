@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react';
-import { Model, ChatHistoryEntry, Mode } from '../types';
+import { Model, ChatHistoryEntry, Mode, BenchmarkResult } from '../types';
 import FormattedContent from './FormattedContent';
 import { MessageSquare, RotateCcw } from 'lucide-react';
 import { MODE_RECIPES } from '../constants';
+import BenchmarkResults from './BenchmarkResults';
 
 interface DiscussionTranscriptProps {
     history: ChatHistoryEntry[];
@@ -65,6 +66,23 @@ export default function DiscussionTranscript({
                     </div>
                 </div>
             );
+        }
+
+        // Handle benchmark results
+        if (entry.kind === 'benchmark_results') {
+            try {
+                const results: BenchmarkResult[] = JSON.parse(entry.content);
+                return (
+                    <div key={index} className="flex justify-center mb-6 w-full">
+                        <div className="max-w-[95%] w-full">
+                            <BenchmarkResults results={results} />
+                        </div>
+                    </div>
+                );
+            } catch (e) {
+                console.error('Failed to parse benchmark results:', e);
+                return null;
+            }
         }
 
         // Handle Assistant / System messages based on 'kind'

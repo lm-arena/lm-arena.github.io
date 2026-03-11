@@ -1,4 +1,4 @@
-import { BackgroundStyle, Mode, Model, TopicPack, TopicPrompt, TrendingTopic } from './types';
+import { BackgroundStyle, Mode, Model, TopicPack, TopicPrompt, TrendingTopic, SpatialTask } from './types';
 
 export const SELF_HOSTED_DEFAULT_PRIORITY = 50;
 export const GITHUB_DEFAULT_PRIORITY = 100;
@@ -304,38 +304,184 @@ export const LAYOUT = {
   scrollClamp: 200,     // Max scroll offset in either direction (px)
 };
 
-// Shared response guidelines used in both analyze and debate modes
-const RESPONSE_GUIDELINES = `Guidelines for your response:
-- Focus on facts and problem-solving with direct, objective information
-- Show your reasoning step-by-step, but keep each step concise
-- Avoid unnecessary superlatives, praise, or emotional validation
-- Do not repeat the question or add meta-commentary
-- Get straight to the analysis - no preamble like "Let me think about this"
-- When uncertain, acknowledge it and explain why rather than claiming certainty
-- Be professional and objective - prioritize technical accuracy over validation`;
+// System prompts for orchestration modes - focused and directive
+export const ANALYZE_RESPONSE_SYSTEM = `You are analyzing a question in a multi-model session.
 
-// System prompts for orchestration modes
-export const ANALYZE_RESPONSE_SYSTEM = `You are participating in a multi-model analysis session.
+Focus on:
+- Accuracy: direct, objective reasoning
+- Clarity: explain step-by-step
+- Conciseness: 50-150 words
+- No preamble or meta-commentary`;
 
-${RESPONSE_GUIDELINES}
+export const DEBATE_TURN_SYSTEM = `You are responding to a question in a multi-model debate.
 
-Your task:
-- Provide your independent analysis of the question
-- Your response will be compared with other models to identify consensus and divergence
-- Focus on clear reasoning and key insights
-- No need to mention other models or compare approaches
+Your turn:
+- Answer directly and clearly
+- Build on or challenge prior points if relevant
+- Show your reasoning explicitly
+- Keep to 50-150 words`;
 
-Target length: 100-200 words.`;
+// Spatial reasoning benchmark tasks
+// Hand-curated tasks grounded in 2025-2026 spatial reasoning research (SpatialBench, SpatialText, SnorkelSpatial)
 
-export const DEBATE_TURN_SYSTEM = `You are participating in a multi-model debate.
-
-${RESPONSE_GUIDELINES}
-
-Your task:
-- Respond to the question considering previous responses (if any)
-- You may build on, challenge, or offer alternatives to earlier points
-- Bring new perspectives or evidence to the discussion
-- Reference specific points from others when relevant, but stay concise
-- No meta-commentary about the debate process itself
-
-Target length: 100-200 words.`;
+export const SPATIAL_REASONING_TASKS: Record<string, SpatialTask[]> = {
+  route: [
+    {
+      id: 'route-001',
+      category: 'route',
+      prompt: `You are standing at the front door of a house.
+The living room is through the left doorway, with a sofa facing the east wall.
+The kitchen is south of the living room, accessed through a doorway on the far wall.
+Describe how to reach the kitchen from where you are standing.`,
+      expected_answer: 'turn left, enter living room, walk to the south wall, pass through doorway into kitchen',
+      answer_format: 'direction',
+      difficulty: 'easy'
+    },
+    {
+      id: 'route-002',
+      category: 'route',
+      prompt: `Imagine you are in a museum. You enter through the main entrance facing north.
+To your right (east) is the sculpture gallery. Beyond that is the painting hall.
+The café is west of the main entrance.
+If you want to visit the painting hall first, then the café, describe your route.`,
+      expected_answer: 'turn right, enter sculpture gallery, continue east to painting hall, then return west past entrance to café',
+      answer_format: 'direction',
+      difficulty: 'medium'
+    },
+    {
+      id: 'route-003',
+      category: 'route',
+      prompt: `You are at the center of a circular plaza. North is the park entrance.
+East of center is the fountain. West of center is the market.
+South of center is the town hall.
+To reach the market from where you are, which direction do you walk?`,
+      expected_answer: 'west',
+      answer_format: 'direction',
+      difficulty: 'easy'
+    },
+    {
+      id: 'route-004',
+      category: 'route',
+      prompt: `You are in a library facing a bookshelf. The reference desk is to your right.
+Behind you (past the entrance you came from) is the children's section.
+To your left is the reading area.
+If you need to go to the reference desk, then the children's section, describe your sequence of turns.`,
+      expected_answer: 'turn right to reach reference desk, then turn around and walk back past entrance to reach children\'s section',
+      answer_format: 'direction',
+      difficulty: 'medium'
+    },
+    {
+      id: 'route-005',
+      category: 'route',
+      prompt: `Starting at the corner of Main Street and Oak Avenue, facing east along Main Street.
+The bank is on your right (south side).
+The pharmacy is across the street on your left (north side).
+To reach the pharmacy, what do you do?`,
+      expected_answer: 'cross the street to the left, or turn left to face north then cross',
+      answer_format: 'direction',
+      difficulty: 'easy'
+    }
+  ],
+  relationship: [
+    {
+      id: 'relationship-001',
+      category: 'relationship',
+      prompt: `Scene: A round table is in the center of the room.
+A red chair is on the north side, a blue chair on the west side, a green chair on the south side.
+What color chair is directly opposite the red chair?`,
+      expected_answer: 'green',
+      answer_format: 'entity',
+      difficulty: 'easy'
+    },
+    {
+      id: 'relationship-002',
+      category: 'relationship',
+      prompt: `In a rectangular arrangement: Alice sits north, Bob sits east of Alice, Carol sits south of Bob.
+If David sits west of Carol, where is David relative to Alice?`,
+      expected_answer: 'west of Alice',
+      answer_format: 'entity',
+      difficulty: 'medium'
+    },
+    {
+      id: 'relationship-003',
+      category: 'relationship',
+      prompt: `A book is on a shelf above a box.
+The box is to the left of a lamp.
+The lamp is to the right of a plant.
+If the plant is on the left, what is the correct left-to-right order on the ground level?`,
+      expected_answer: 'plant, box, lamp',
+      answer_format: 'entity',
+      difficulty: 'medium'
+    },
+    {
+      id: 'relationship-004',
+      category: 'relationship',
+      prompt: `Three buildings arranged in a line: Town Hall is in the center.
+The Library is to the left (west) of Town Hall.
+The School is to the right (east) of Town Hall.
+Which building is furthest east?`,
+      expected_answer: 'School',
+      answer_format: 'entity',
+      difficulty: 'easy'
+    },
+    {
+      id: 'relationship-005',
+      category: 'relationship',
+      prompt: `In a parking lot: A red car is parked north of a blue car.
+The blue car is parked east of a yellow car.
+Is the red car north or south of the yellow car?`,
+      expected_answer: 'north and east',
+      answer_format: 'description',
+      difficulty: 'medium'
+    }
+  ],
+  perspective: [
+    {
+      id: 'perspective-001',
+      category: 'perspective',
+      prompt: `You are standing in the garden facing north toward the house.
+To your left is the oak tree. To your right is the shed.
+In absolute coordinates (where north is up), describe the positions of the tree and shed relative to the house.`,
+      expected_answer: 'oak tree is west of observer, shed is east of observer',
+      answer_format: 'description',
+      difficulty: 'medium'
+    },
+    {
+      id: 'perspective-002',
+      category: 'perspective',
+      prompt: `Imagine a person facing east with a river on their right.
+In absolute terms, which direction is the river?`,
+      expected_answer: 'south',
+      answer_format: 'direction',
+      difficulty: 'easy'
+    },
+    {
+      id: 'perspective-003',
+      category: 'perspective',
+      prompt: `You are sitting at a dining table facing your friend across from you.
+Your friend\'s right hand points toward the window.
+In absolute terms, which wall is the window on?`,
+      expected_answer: 'depends on which direction you are facing',
+      answer_format: 'description',
+      difficulty: 'hard'
+    },
+    {
+      id: 'perspective-004',
+      category: 'perspective',
+      prompt: `A person is walking north. They turn 90 degrees to their right.
+In which absolute direction are they now walking?`,
+      expected_answer: 'east',
+      answer_format: 'direction',
+      difficulty: 'easy'
+    },
+    {
+      id: 'perspective-005',
+      category: 'perspective',
+      prompt: `You are facing west. A car is to your left.
+In absolute terms, which direction is the car from you?`,
+      expected_answer: 'south',
+      answer_format: 'direction',
+      difficulty: 'medium'
+    }
+  ]
+};

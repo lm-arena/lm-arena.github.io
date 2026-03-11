@@ -60,5 +60,40 @@ export type ChatHistoryEntry = {
   kind?: 'compare_summary'
   | 'analyze_synthesis'
   | 'analyze_response'
-  | 'debate_turn';
+  | 'debate_turn'
+  | 'benchmark_results';
 };
+
+// Spatial reasoning benchmark types
+export interface SpatialTask {
+  id: string;
+  category: 'route' | 'relationship' | 'perspective';
+  prompt: string;
+  expected_answer: string;
+  answer_format: 'free_text' | 'direction' | 'entity' | 'description';
+  difficulty: 'easy' | 'medium' | 'hard';
+}
+
+export interface BenchmarkConfig {
+  mode: 'spatial_reasoning';
+  task_category: 'route' | 'relationship' | 'perspective' | 'all';
+  num_tasks: number;
+  difficulty_filter?: 'easy' | 'medium' | 'hard' | 'all';
+}
+
+export interface SpatialResult {
+  model_id: string;
+  response: string;
+  predicted_answer: string;
+  accuracy: number;
+  reasoning_depth: 'shallow' | 'adequate' | 'deep';
+  response_time_ms: number;
+}
+
+export interface BenchmarkResult {
+  task_id: string;
+  task_text: string;
+  category: 'route' | 'relationship' | 'perspective';
+  expected_answer: string;
+  model_results: SpatialResult[];
+}

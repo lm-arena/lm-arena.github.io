@@ -17,6 +17,14 @@
       "rank": 2
     },
     {
+      "key": "qwenclaude27b",
+      "name": "Qwen3.5-27B Claude Distilled",
+      "localPort": 8206,
+      "category": "medium",
+      "modelId": "qwen3.5-27b-claude-distilled",
+      "rank": 2
+    },
+    {
       "key": "smollm3",
       "name": "SmolLM3 3B",
       "localPort": 8104,
@@ -57,27 +65,11 @@
       "rank": 5
     },
     {
-      "key": "r1qwen",
-      "name": "DeepSeek R1 1.5B",
-      "localPort": 8300,
-      "category": "reasoning",
-      "modelId": "deepseek-r1-distill-qwen-1.5b",
-      "rank": 5
-    },
-    {
       "key": "lfm2mini",
       "name": "LFM2 350M",
       "localPort": 8110,
       "category": "small",
       "modelId": "lfm2-350m",
-      "rank": 6
-    },
-    {
-      "key": "gemma",
-      "name": "Gemma 3 12B",
-      "localPort": 8200,
-      "category": "medium",
-      "modelId": "gemma-3-12b-it",
       "rank": 6
     },
     {
@@ -97,12 +89,12 @@
       "rank": 8
     },
     {
-      "key": "phi",
-      "name": "Phi-4 Mini",
-      "localPort": 8101,
-      "category": "small",
-      "modelId": "phi-4-mini",
-      "rank": 9
+      "key": "qwen7b",
+      "name": "Qwen3.5 7B",
+      "localPort": 8205,
+      "category": "medium",
+      "modelId": "qwen3.5-7b",
+      "rank": 8
     },
     {
       "key": "rnj",
@@ -113,44 +105,12 @@
       "rank": 9
     },
     {
-      "key": "llama",
-      "name": "Llama 3.2-3B",
-      "localPort": 8201,
-      "category": "medium",
-      "modelId": "llama-3.2-3b",
-      "rank": 10
-    },
-    {
-      "key": "functiongemma",
-      "name": "FunctionGemma 270M",
-      "localPort": 8103,
-      "category": "small",
-      "modelId": "functiongemma-270m-it",
-      "rank": 12
-    },
-    {
       "key": "gptoss",
       "name": "GPT-OSS 20B",
       "localPort": 8303,
       "category": "reasoning",
       "modelId": "gpt-oss-20b",
       "rank": 13
-    },
-    {
-      "key": "dasd",
-      "name": "DASD-4B Thinking",
-      "localPort": 8106,
-      "category": "small",
-      "modelId": "dasd-4b-thinking",
-      "rank": 14
-    },
-    {
-      "key": "agentcpm",
-      "name": "AgentCPM-Explore 4B",
-      "localPort": 8107,
-      "category": "small",
-      "modelId": "agentcpm-explore-4b",
-      "rank": 15
     }
   ]
 }
