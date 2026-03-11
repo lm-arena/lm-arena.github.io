@@ -18,7 +18,7 @@ export interface Model {
   routing_category?: string | null;
 }
 
-export type Mode = 'compare' | 'analyze' | 'debate' | 'chat';
+export type Mode = 'compare' | 'analyze' | 'debate' | 'chat' | 'benchmark';
 
 export interface Position {
   x: number;
