@@ -10,25 +10,18 @@ run-name: "${{ inputs.model }}"
         options:
           - nanbeige
           - qwen
+          - qwenclaude27b
           - smollm3
           - lfm2
           - phireasoning
           - lfm2thinking
           - gemma3n
-          - r1qwen
           - lfm2mini
-          - gemma
-          - qwen14b
           - falcon
           - jancode
           - qwen7b
-          - phi
           - rnj
-          - llama
-          - functiongemma
           - gptoss
-          - dasd
-          - agentcpm
       benchmark_after:
         description: 'Trigger benchmark run once server is healthy'
         required: false
