@@ -307,6 +307,7 @@ let scatterChart  = null;
 let accChart      = null;
 let p50Chart      = null;
 let tpsChart      = null;
+let _resizeHandler = null;
 
 const $main = document.getElementById('main');
 
@@ -447,15 +448,20 @@ function initCharts() {
   p50Chart     = echarts.init(document.getElementById('chart-p50'),     null, { renderer: 'canvas' });
   tpsChart     = echarts.init(document.getElementById('chart-tps'),     null, { renderer: 'canvas' });
 
-  window.addEventListener('resize', () => {
+  _resizeHandler = () => {
     scatterChart?.resize();
     accChart?.resize();
     p50Chart?.resize();
     tpsChart?.resize();
-  });
+  };
+  window.addEventListener('resize', _resizeHandler);
 }
 
 function disposeCharts() {
+  if (_resizeHandler) {
+    window.removeEventListener('resize', _resizeHandler);
+    _resizeHandler = null;
+  }
   scatterChart?.dispose(); scatterChart = null;
   accChart?.dispose();     accChart     = null;
   p50Chart?.dispose();     p50Chart     = null;

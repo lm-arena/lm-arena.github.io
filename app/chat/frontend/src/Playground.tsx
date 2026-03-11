@@ -1285,7 +1285,6 @@ function PlaygroundInner() {
                   cardRefs={cardRefs}
                   handlePointerDown={handlePointerDown}
                   dragState={dragState}
-                  handleModelToggle={handleModelToggle}
                   setContextMenu={setContextMenu}
                   suppressClickRef={suppressClickRef}
                   getTailSnippet={getTailSnippet}

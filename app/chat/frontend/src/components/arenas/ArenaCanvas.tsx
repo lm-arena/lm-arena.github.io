@@ -29,7 +29,6 @@ interface ArenaCanvasProps {
   cardRefs: MutableRefObject<Map<string, HTMLDivElement>>;
   handlePointerDown: (event: ReactPointerEvent, modelId: string) => void;
   dragState: DragState | null;
-  handleModelToggle: (modelId: string) => void;
   setContextMenu: Dispatch<SetStateAction<ArenaContextMenu>>;
   suppressClickRef: MutableRefObject<{ card: boolean; background: boolean }>;
   getTailSnippet: (text: string, maxChars?: number) => string;

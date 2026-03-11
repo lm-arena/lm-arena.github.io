@@ -111,6 +111,8 @@ export function OrchestratorCard({
 
   const isWorking = orchestratorStatus === 'responding';
   const activeColor = isWorking ? '#fbbf24' : moderatorModel.color;
+  const githubModels = availableModels.filter(m => m.type === 'github');
+  const selfHostedModels = availableModels.filter(m => m.type === 'self-hosted');
 
   return (
     <div
@@ -278,12 +280,12 @@ export function OrchestratorCard({
               <div className="px-3 py-2 text-[10px] uppercase tracking-wider text-slate-500 font-semibold border-b border-slate-700/50">
                 Select Orchestrator
               </div>
-              {availableModels.filter(m => m.type === 'github').length > 0 && (
+              {githubModels.length > 0 && (
                 <>
                   <div className="px-3 py-1.5 text-[9px] uppercase tracking-wider text-slate-600 font-semibold">
                     GitHub Models
                   </div>
-                  {availableModels.filter(m => m.type === 'github').map(model => (
+                  {githubModels.map(model => (
                     <button
                       key={model.id}
                       onClick={() => {
@@ -305,12 +307,12 @@ export function OrchestratorCard({
                   ))}
                 </>
               )}
-              {availableModels.filter(m => m.type === 'self-hosted').length > 0 && (
+              {selfHostedModels.length > 0 && (
                 <>
                   <div className="px-3 py-1.5 text-[9px] uppercase tracking-wider text-slate-600 font-semibold border-t border-slate-700/50 mt-1">
                     Self-Hosted Models
                   </div>
-                  {availableModels.filter(m => m.type === 'self-hosted').map(model => (
+                  {selfHostedModels.map(model => (
                     <button
                       key={model.id}
                       onClick={() => {
