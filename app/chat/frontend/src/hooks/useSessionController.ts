@@ -1,4 +1,11 @@
 import { Dispatch, SetStateAction } from 'react';
+import { GENERATION_DEFAULTS, isThinkingModel } from '../constants';
+import { fetchChatStream } from '../utils/streaming';
+import { ChatHistoryEntry, Mode, Model } from '../types';
+import { ExecutionTimeData } from '../components/ExecutionTimeDisplay';
+import { parseThinkingChunk, ThinkingState } from '../utils/thinkingParser';
+import { runAnalyze } from '../engines/analyzeEngine';
+import { runDebate } from '../engines/debateEngine';
 
 // Sentinel prefix that cannot appear in normal text or model output (null bytes).
 // renderSvgContent in ArenaCanvas checks for this exact prefix before calling
@@ -16,13 +23,6 @@ export { SVG_SENTINEL_PREFIX, SVG_SENTINEL_SUFFIX };
 
 const escapeHtml = (t: string) =>
   t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-import { GENERATION_DEFAULTS, isThinkingModel } from '../constants';
-import { fetchChatStream } from '../utils/streaming';
-import { ChatHistoryEntry, Mode, Model } from '../types';
-import { ExecutionTimeData } from '../components/ExecutionTimeDisplay';
-import { parseThinkingChunk, ThinkingState } from '../utils/thinkingParser';
-import { runAnalyze } from '../engines/analyzeEngine';
-import { runDebate } from '../engines/debateEngine';
 
 type DiscussionTurn = {
   turn_number: number;
@@ -413,10 +413,8 @@ export function useSessionController(params: SessionControllerParams) {
 
           const responseText = event.response ?? '';
           recordResponse(modelId, responseText, { replace: true });
-          if (!(previousResponses && previousResponses[modelId])) {
-            setModelsData(prev => prev.map(model => model.id === modelId ? { ...model, response: responseText } : model));
-            appendEventHistory(`${modelIdToName(modelId)}:\n${responseText}`, 'analyze_response');
-          }
+          setModelsData(prev => prev.map(model => model.id === modelId ? { ...model, response: responseText } : model));
+          appendEventHistory(`${modelIdToName(modelId)}:\n${responseText}`, 'analyze_response');
         }
 
         if (eventType === 'model_error' && event.model_id) {
