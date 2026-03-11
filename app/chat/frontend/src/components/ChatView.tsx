@@ -191,6 +191,8 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
             return next;
         });
     }, []);
+    const messagesRef = useRef(messages);
+    useEffect(() => { messagesRef.current = messages; }, [messages]);
     const abortRefs = useRef<Map<string, AbortController>>(new Map());
     const scrollRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -288,7 +290,7 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
         const userMessage: ChatMessage = { role: 'user', content: text };
         setMessages(prev => [...prev, userMessage]);
 
-        const baseMessages = [...messages, userMessage].map(m => ({ role: m.role, content: m.content }));
+        const baseMessages = [...messagesRef.current, userMessage].map(m => ({ role: m.role, content: m.content }));
 
         const systemPrompts: Array<{ role: 'system'; content: string }> = [];
 
@@ -349,20 +351,20 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
                 for await (const event of stream) {
                     if (event.event === 'routing') {
                         routingInfo = {
-                            routed_to: String(event.routed_to ?? ''),
-                            category: String(event.category ?? 'general'),
-                            classifier: event.classifier ? String(event.classifier) : null,
+                            routed_to: event.routed_to,
+                            category: event.category,
+                            classifier: event.classifier,
                         };
                         continue;
                     }
-                    if (event.event === 'error' || event.error === true) {
+                    if (event.event === 'error') {
                         hasError = true;
-                        content = typeof event.content === 'string' ? event.content : 'An error occurred';
+                        content = event.content;
                         streamingContentRef.current.set(modelId, content);
                         syncStreamingState();
                         continue;
                     }
-                    if (event.content) {
+                    if (event.event === 'token') {
                         if (firstToken) {
                             firstToken = false;
                             firstTokenTime = Date.now();
@@ -400,7 +402,7 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
         });
 
         await Promise.allSettled(streamPromises);
-    }, [isGenerating, selectedModels, messages, modelMap, githubToken, uiBuilderEnabled, setMessages, setIsGenerating, syncStreamingState, getModelEndpoints, models]);
+    }, [isGenerating, selectedModels, modelMap, githubToken, uiBuilderEnabled, setMessages, setIsGenerating, syncStreamingState, getModelEndpoints, models]);
 
     const stopGeneration = useCallback(() => {
         abortRefs.current.forEach(c => c.abort());

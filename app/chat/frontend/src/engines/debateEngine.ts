@@ -96,22 +96,40 @@ Provide your response:`;
 }
 
 
-async function* executeTurn(
-  query: string,
-  modelId: string,
-  turnNumber: number,
-  roundNumber: number,
-  previousTurns: DebateTurn[],
-  participantIds: string[],
-  maxTokens: number,
-  temperature: number,
-  systemPrompt: string | null,
-  githubToken: string | null,
-  signal: AbortSignal,
-  modelEndpoints: Record<string, string>,
-  modelIdToName: (id: string) => string,
-  modelKeys?: Record<string, string>
-): AsyncGenerator<DebateEvent> {
+interface ExecuteTurnParams {
+  query: string;
+  modelId: string;
+  turnNumber: number;
+  roundNumber: number;
+  previousTurns: DebateTurn[];
+  participantIds: string[];
+  maxTokens: number;
+  temperature: number;
+  systemPrompt: string | null;
+  githubToken: string | null;
+  signal: AbortSignal;
+  modelEndpoints: Record<string, string>;
+  modelIdToName: (id: string) => string;
+  modelKeys?: Record<string, string>;
+}
+
+async function* executeTurn(params: ExecuteTurnParams): AsyncGenerator<DebateEvent> {
+  const {
+    query,
+    modelId,
+    turnNumber,
+    roundNumber,
+    previousTurns,
+    participantIds,
+    maxTokens,
+    temperature,
+    systemPrompt,
+    githubToken,
+    signal,
+    modelEndpoints,
+    modelIdToName,
+    modelKeys,
+  } = params;
   const modelName = modelIdToName(modelId);
   const modelUrl = modelEndpoints[modelId];
 
@@ -225,13 +243,13 @@ export async function* runDebate(params: DebateParams): AsyncGenerator<DebateEve
       };
 
       for (const modelId of participants) {
-        for await (const event of executeTurn(
+        for await (const event of executeTurn({
           query,
           modelId,
-          turnCounter,
-          roundNum,
-          completedTurns,
-          participants,
+          turnNumber: turnCounter,
+          roundNumber: roundNum,
+          previousTurns: completedTurns,
+          participantIds: participants,
           maxTokens,
           temperature,
           systemPrompt,
@@ -240,7 +258,7 @@ export async function* runDebate(params: DebateParams): AsyncGenerator<DebateEve
           modelEndpoints,
           modelIdToName,
           modelKeys,
-        )) {
+        })) {
           yield event;
 
           if (event.type === 'turn_complete') {

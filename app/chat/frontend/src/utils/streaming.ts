@@ -1,13 +1,52 @@
 const GITHUB_MODELS_URL = 'https://models.github.ai/inference/chat/completions';
 
-export type ChatStreamEvent = {
-  event: string;
-  model_id?: string;
-  model?: string;
-  content?: string;
-  error?: boolean;
-  [key: string]: unknown;
+export type RoutingEvent = {
+  event: 'routing';
+  model_id: string;
+  routed_to: string;
+  category: string;
+  classifier: string | null;
 };
+
+export type ErrorEvent = {
+  event: 'error';
+  model_id: string;
+  error: true;
+  content: string;
+};
+
+export type StartEvent = {
+  event: 'start';
+  model_id: string;
+  model: string;
+};
+
+export type TokenEvent = {
+  event: 'token';
+  model_id: string;
+  model: string;
+  content: string;
+};
+
+export type DoneEvent = {
+  event: 'done';
+  model_id: string;
+  model: string;
+};
+
+export type InfoEvent = {
+  event: 'info';
+  model_id?: string;
+  content: string;
+};
+
+export type ChatStreamEvent =
+  | RoutingEvent
+  | ErrorEvent
+  | StartEvent
+  | TokenEvent
+  | DoneEvent
+  | InfoEvent;
 
 export interface ChatStreamPayload {
   models: string[];

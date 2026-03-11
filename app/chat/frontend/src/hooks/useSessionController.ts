@@ -20,42 +20,57 @@ type DiscussionTurn = {
 };
 
 interface SessionControllerParams {
+  // — mode & session config —
   mode: Mode;
   moderator: string;
   selected: string[];
   selectedCardIds: Set<string>;
-  githubToken?: string;
-  isGenerating: boolean;
   systemPrompt?: string;
-  summarizeSessionResponses: (responses: Record<string, string>, order: string[]) => string | null;
+  isGenerating: boolean;
+
+  // — model data & lookups —
+  modelsData: Model[];
+  modelIdToName: (id: string) => string;
+  modelKeyMap: Record<string, string>;
+  getModelEndpoints: (models: Model[]) => Record<string, string>;
+  setModelsData: React.Dispatch<React.SetStateAction<Model[]>>;
+
+  // — auth —
+  githubToken?: string;
+
+  // — state setters —
   setLastQuery: (text: string) => void;
   setHoveredCard: (value: string | null) => void;
   setPhaseLabel: Dispatch<SetStateAction<string | null>>;
   setModeratorSynthesis: Dispatch<SetStateAction<string>>;
   setDiscussionTurnsByModel: Dispatch<SetStateAction<Record<string, DiscussionTurn[]>>>;
+  setIsGenerating: (value: boolean) => void;
+  setIsSynthesizing: (value: boolean) => void;
+  setSpeaking: React.Dispatch<React.SetStateAction<Set<string>>>;
+  setExecutionTimes: React.Dispatch<React.SetStateAction<Record<string, ExecutionTimeData>>>;
+
+  // — failed model tracking —
   resetFailedModels: () => void;
   markModelFailed: (modelId: string) => void;
+
+  // — refs —
   failedModelsRef: React.MutableRefObject<Set<string>>;
   currentDiscussionTurnRef: React.MutableRefObject<{ modelId: string; turnNumber: number } | null>;
   sessionModelIdsRef: React.MutableRefObject<string[]>;
   abortControllerRef: React.MutableRefObject<AbortController | null>;
   thinkingStateRef: React.MutableRefObject<Record<string, { inThink: boolean; carry: string; implicitThinking?: boolean }>>;
   conversationHistoryRef: React.MutableRefObject<ChatHistoryEntry[]>;
+
+  // — history utilities —
   pushHistoryEntries: (entries: ChatHistoryEntry[]) => void;
   historyToText: (history: ChatHistoryEntry[]) => string;
   buildCarryoverHistory: (history: ChatHistoryEntry[], targetMode: Mode) => ChatHistoryEntry[];
-  setModelsData: React.Dispatch<React.SetStateAction<Model[]>>;
-  modelIdToName: (id: string) => string;
-  setExecutionTimes: React.Dispatch<React.SetStateAction<Record<string, ExecutionTimeData>>>;
-  setIsGenerating: (value: boolean) => void;
-  setIsSynthesizing: (value: boolean) => void;
-  setSpeaking: React.Dispatch<React.SetStateAction<Set<string>>>;
+  summarizeSessionResponses: (responses: Record<string, string>, order: string[]) => string | null;
+
+  // — stream utilities —
   enqueueStreamDelta: (modelId: string, answerAdd: string, thinkingAdd: string) => void;
   clearPendingStreamForModel: (modelId: string) => void;
   resetPendingStream: () => void;
-  getModelEndpoints: (models: Model[]) => Record<string, string>;
-  modelKeyMap: Record<string, string>;
-  modelsData: Model[];
 }
 
 interface SendMessageOptions {

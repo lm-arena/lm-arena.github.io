@@ -240,7 +240,7 @@
         <div class="state-wrap">
           <p>${e.message === 'index not found' || e.message === 'no runs yet'
             ? `No results yet. Trigger the <a href="https://github.com/lm-arena/lm-arena.github.io/actions/workflows/benchmark.yml" style="color:var(--accent)">benchmark workflow</a> to generate results.`
-            : `Failed to load: ${e.message}`
+            : `Failed to load: ${escHtml(e.message)}`
           }</p>
         </div>`;
     }
