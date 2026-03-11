@@ -6,7 +6,7 @@ Used by Dockerfile.llama-server so per-model inference_server.py files are not n
 """
 import os
 import sys
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 import uvicorn
 from shared.llama_server_wrapper import create_llama_server_app_for_model
