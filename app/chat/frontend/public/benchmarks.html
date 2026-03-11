@@ -10,10 +10,10 @@
 
     main {
       flex: 1;
-      max-width: 960px;
+      max-width: 1100px;
       width: 100%;
       margin: 0 auto;
-      padding: 40px 24px;
+      padding: 40px 24px 80px;
     }
 
     .page-header {
@@ -35,91 +35,141 @@
     }
     select:focus { outline: none; border-color: var(--accent); }
 
-    .state-wrap {
-      display: flex; flex-direction: column; align-items: center;
-      gap: 14px; padding-top: 80px; color: var(--text-secondary);
+    /* Caveat banner */
+    .caveat-banner {
+      border-left: 3px solid var(--warning);
+      background: rgba(210,153,34,.08);
+      padding: 10px 14px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      margin-bottom: 36px;
+      line-height: 1.5;
+    }
+    .caveat-banner strong { color: var(--warning); }
+
+    /* Section headers */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      margin-top: 40px;
+    }
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: .06em;
     }
 
-    .suite-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
-    .tab {
-      padding: 5px 14px; border-radius: var(--radius);
-      font-size: 12.5px; cursor: pointer;
-      background: var(--surface); border: 1px solid var(--border); color: var(--text-secondary);
+    /* Suite pills */
+    .suite-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .pill {
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 12px;
+      cursor: pointer;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      transition: background .1s, border-color .1s, color .1s;
     }
-    .tab:hover { border-color: var(--text-secondary); color: var(--text); }
-    .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .pill:hover { border-color: var(--text-secondary); color: var(--text); }
+    .pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-    /* Suite tooltip */
-    .tab-wrap { position: relative; display: inline-flex; align-items: center; gap: 4px; }
-.tip-box {
-      position: absolute; bottom: calc(100% + 8px); left: 0;
-      background: var(--surface-raised); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 8px 10px;
-      font-size: 11.5px; color: var(--text-secondary); line-height: 1.5;
-      width: 230px; pointer-events: none;
-      opacity: 0; transition: opacity .15s;
-      z-index: 20;
+    /* Charts */
+    .chart-container { width: 100%; }
+
+    /* Speed grid */
+    .speed-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
     }
-    .tip-box strong { color: var(--text); font-weight: 600; display: block; margin-bottom: 2px; }
-    .tab-wrap:hover .tip-box { opacity: 1; }
+    @media (max-width: 620px) { .speed-grid { grid-template-columns: 1fr; } }
 
-    /* Summary table */
-    .table-wrap { overflow-x: auto; margin-bottom: 40px; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .chart-sublabel {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
     thead th {
-      text-align: left; padding: 8px 12px;
-      font-size: 11px; font-weight: 600; color: var(--text-secondary);
-      text-transform: uppercase; letter-spacing: .04em;
+      text-align: left;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: .04em;
       border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
     }
+    thead th:first-child { cursor: default; }
+    thead th:hover:not(:first-child) { color: var(--text); }
+    thead th.sort-asc::after { content: ' ↑'; opacity: 1; color: var(--accent); }
+    thead th.sort-desc::after { content: ' ↓'; opacity: 1; color: var(--accent); }
     tbody tr { border-bottom: 1px solid var(--border); }
     tbody tr:last-child { border-bottom: none; }
     tbody td { padding: 10px 12px; vertical-align: top; }
     tbody tr:hover > td { background: var(--surface-raised); }
 
     .model-cell { display: flex; align-items: flex-start; gap: 8px; }
-    .model-icon { width: 16px; height: 16px; border-radius: 3px; flex-shrink: 0; margin-top: 1px; opacity: .85; }
+    .model-icon { width: 16px; height: 16px; border-radius: 3px; flex-shrink: 0; margin-top: 2px; opacity: .85; }
     .model-name { font-weight: 500; font-size: 13px; }
-    .model-sub  { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+    .model-sub { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
 
-    .bar-cell { min-width: 100px; }
-    .bar-bg   { background: var(--surface-raised); border-radius: 3px; height: 6px; margin-top: 2px; }
-    .bar-fill { height: 6px; border-radius: 3px; background: var(--accent); }
+    .suite-col { text-align: right; min-width: 80px; }
+    .acc-pct { font-weight: 600; }
+    .acc-frac { font-size: 11px; color: var(--text-secondary); display: block; margin-top: 1px; }
 
-    /* Expand toggle */
+    .num-col { text-align: right; min-width: 72px; white-space: nowrap; }
+    .row-offline td { opacity: .62; }
+
+    /* Trace expand button */
     .expand-btn {
-      background: none; border: none; color: var(--text-secondary);
+      background: none; border: none; color: var(--accent);
       cursor: pointer; font-size: 11px; padding: 2px 0;
-      text-decoration: underline; text-underline-offset: 2px;
+      display: block; margin-top: 4px;
     }
-    .expand-btn:hover { color: var(--text); }
+    .expand-btn:hover { text-decoration: underline; }
 
-    /* Traces */
+    /* Trace panel */
     .traces-row td { padding: 0; }
     .traces-wrap {
       border-top: 1px solid var(--border);
       padding: 12px 16px 16px;
+      background: var(--surface);
     }
     .trace-header {
       font-size: 11px; font-weight: 600; color: var(--text-secondary);
       text-transform: uppercase; letter-spacing: .04em;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
     .trace-item {
       padding: 10px 0;
       border-bottom: 1px solid var(--border);
-      font-size: 12.5px;
     }
     .trace-item:last-child { border-bottom: none; }
-    .trace-prompt { color: var(--text-secondary); margin-bottom: 4px; }
+    .trace-prompt { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
     .trace-response {
       font-family: var(--font-mono); font-size: 12px;
       color: var(--text); white-space: pre-wrap; word-break: break-word;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
-    .trace-think {
-      margin-bottom: 4px;
-    }
+    .trace-think { margin-bottom: 6px; }
     .trace-think summary {
       font-size: 11px; color: var(--text-secondary); cursor: pointer;
       list-style: none; display: inline-flex; align-items: center; gap: 4px;
@@ -127,15 +177,33 @@
     }
     .trace-think summary::before { content: '▶'; font-size: 9px; }
     .trace-think[open] summary::before { content: '▼'; }
-    .trace-think summary:hover { color: var(--text); }
     .trace-think .think-body {
       font-family: var(--font-mono); font-size: 11.5px;
       color: var(--text-secondary); white-space: pre-wrap; word-break: break-word;
       border-left: 2px solid var(--border); margin-top: 6px; padding-left: 10px;
     }
-    .trace-meta { font-size: 11px; color: var(--text-secondary); display: flex; gap: 12px; }
-    .badge-offline { background: rgba(139,148,158,.12); color: var(--text-secondary); }
-    .row-offline td { opacity: .45; }
+    .trace-verdict {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11.5px; padding: 4px 8px; border-radius: var(--radius);
+      font-family: var(--font-mono); margin-bottom: 4px;
+    }
+    .trace-verdict.pass {
+      background: rgba(63,185,80,.1); color: var(--success);
+    }
+    .trace-verdict.fail {
+      background: rgba(248,81,73,.1); color: var(--danger);
+      border-left: 2px solid var(--danger);
+    }
+    .trace-verdict.miss {
+      background: rgba(139,148,158,.1); color: var(--text-secondary);
+    }
+    .trace-latency { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+    /* State */
+    .state-wrap {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 14px; padding-top: 80px; color: var(--text-secondary);
+    }
   </style>
 </head>
 <body>
@@ -163,312 +231,776 @@
 </footer>
 
 <script>
-  const SUITES = ['overall', 'mmlu', 'instruct', 'gsm8k'];
+// ─── CONSTANTS ────────────────────────────────────────────────────────────────
 
-  const SUITE_INFO = {
-    overall: {
-      label: 'overall',
-      name: 'Overall',
-      desc: 'Aggregate latency (P50/max) and throughput across all suites. No accuracy score — pure speed.',
-    },
-    mmlu: {
-      label: 'mmlu · 10q',
-      name: 'mini-MMLU',
-      full: 'mini-MMLU (10 questions)',
-      desc: 'Factual knowledge across science, history, and math. 10-question proxy — not comparable to published MMLU scores (57 subjects, 14k questions). Grading: word-boundary substring match (e.g. "Au" in response).',
-    },
-    instruct: {
-      label: 'instruct · 8q',
-      name: 'Instruct',
-      desc: 'Instruction following — 8 prompts requiring precise format compliance (single word, exact number). Tests whether the model follows directions without rambling. Grading: strict — word-boundary match AND response is 3 words or fewer.',
-    },
-    gsm8k: {
-      label: 'gsm8k · 5q',
-      name: 'mini-GSM8K',
-      full: 'mini-GSM8K (5 questions)',
-      desc: 'Arithmetic word problems requiring multi-step reasoning. 5-question proxy — not comparable to published GSM8K scores (8,500 problems). Grading: word-boundary substring match for the numeric answer.',
-    },
+const ECHARTS_CDN = 'https://cdn.jsdelivr.net/npm/echarts@6.0.0/dist/echarts.min.js';
+
+const PROVIDER_COLORS = {
+  qwen:             '#C678DD',
+  microsoft:        '#61AFEF',
+  google:           '#4285F4',
+  huggingfacetb:    '#E5A00D',
+  liquidai:         '#3EC9A7',
+  'alibaba-apsara': '#FF8C42',
+  openbmb:          '#56B6C2',
+  janhq:            '#7CB9E8',
+  meta:             '#0082FB',
+  tii:              '#98C379',
+  essentialai:      '#E06C75',
+  deepseek:         '#00B4D8',
+  nanbeige:         '#ABB2BF',
+  openai:           '#10A37F',
+};
+
+const FAVICON_DOMAINS = {
+  qwen:             'qwen.ai',
+  microsoft:        'microsoft.com',
+  google:           'deepmind.google',
+  huggingfacetb:    'huggingface.co',
+  liquidai:         'liquid.ai',
+  'alibaba-apsara': 'alibabacloud.com',
+  openbmb:          'openbmb.cn',
+  janhq:            'jan.ai',
+  meta:             'meta.com',
+  tii:              'falconllm.tii.ae',
+  essentialai:      'essential.ai',
+  deepseek:         'deepseek.com',
+  nanbeige:         'huggingface.co',
+  openai:           'openai.com',
+};
+
+const SUITE_INFO = {
+  mmlu: {
+    label: 'mini-MMLU · 10q',
+    name: 'mini-MMLU',
+    desc: 'Factual knowledge (science, history, math). 10-question proxy — not comparable to published MMLU scores (57 subjects, 14k questions). Grading: word-boundary match.',
+  },
+  instruct: {
+    label: 'Instruct · 8q',
+    name: 'Instruct',
+    desc: 'Instruction following — 8 prompts requiring precise format compliance (single word, exact number). Grading: strict (word-boundary match AND response ≤3 words).',
+  },
+  gsm8k: {
+    label: 'mini-GSM8K · 5q',
+    name: 'mini-GSM8K',
+    desc: 'Arithmetic word problems. 5-question proxy — not comparable to published GSM8K scores (8,500 problems). Grading: word-boundary match on the numeric answer.',
+  },
+};
+
+// ECharts common colors
+const CT = '#8b949e';  // chart text
+const CB = '#30363d';  // chart border/axis
+const CG = 'rgba(48,54,61,0.5)';  // chart grid lines
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+
+let runData     = {};
+let modelMeta   = {};
+let runs        = [];
+let currentDate = '';
+let activeSuite = 'mmlu';
+let expanded    = new Set();
+let sortKey     = 'mmlu';
+let sortAsc     = false;
+let chartsEnabled = false;
+let scatterChart  = null;
+let accChart      = null;
+let p50Chart      = null;
+let tpsChart      = null;
+
+const $main = document.getElementById('main');
+
+// ─── UTILITIES ────────────────────────────────────────────────────────────────
+
+function esc(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function pColor(owned_by) {
+  return PROVIDER_COLORS[owned_by] || '#8b949e';
+}
+
+function modelIcon(owned_by) {
+  const domain = FAVICON_DOMAINS[owned_by];
+  if (!domain) return '';
+  return `<img class="model-icon" src="https://www.google.com/s2/favicons?domain=${domain}&sz=32" alt="" loading="lazy">`;
+}
+
+function tpsToSize(tps) {
+  if (!tps || tps <= 0) return 8;
+  return Math.max(8, Math.min(36, 8 + Math.sqrt(tps) * 1.5));
+}
+
+function fmtMs(ms) {
+  if (ms == null || ms <= 0) return '—';
+  return ms >= 1000 ? (ms / 1000).toFixed(1) + 's' : Math.round(ms) + 'ms';
+}
+
+// ─── DATA LOADING ─────────────────────────────────────────────────────────────
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = () => reject(new Error('script load failed'));
+    document.head.appendChild(s);
+  });
+}
+
+async function loadIndex() {
+  const res = await fetch('./benchmarks/index.json');
+  if (!res.ok) throw new Error('index not found');
+  runs = await res.json();
+  if (!runs.length) throw new Error('no runs yet');
+}
+
+async function loadRun(date) {
+  expanded.clear();
+  const res = await fetch(`./benchmarks/${date}.json`);
+  if (!res.ok) throw new Error(`run ${date} not found`);
+  runData = await res.json();
+}
+
+async function loadModelMeta() {
+  try {
+    const res = await fetch('./models.json');
+    if (!res.ok) return;
+    const data = await res.json();
+    modelMeta = Object.fromEntries(
+      (data.models ?? [])
+        .filter(m => m.key)
+        .map(m => [m.key, { name: m.name, description: m.description, owned_by: m.owned_by }])
+    );
+  } catch { /* non-fatal */ }
+}
+
+// ─── SHELL ────────────────────────────────────────────────────────────────────
+
+function renderShell(date) {
+  const runSelector = runs.length > 1
+    ? `<select id="run-select" onchange="switchRun(this.value)">${
+        runs.map(r => `<option value="${r}"${r === date ? ' selected' : ''}>${r}</option>`).join('')
+      }</select>`
+    : `<span style="font-size:12px;color:var(--text-secondary)">${esc(date)}</span>`;
+
+  const pills = Object.entries(SUITE_INFO).map(([k, v]) =>
+    `<button class="pill${k === activeSuite ? ' active' : ''}" data-suite="${k}" onclick="setPill('${k}')" title="${esc(v.desc)}">${esc(v.label)}</button>`
+  ).join('');
+
+  const chartsHtml = chartsEnabled ? `
+    <div class="section-header">
+      <span class="section-title">Accuracy vs Latency</span>
+      <div id="suite-pills" class="suite-pills">${pills}</div>
+    </div>
+    <div id="chart-scatter" class="chart-container" style="height:320px"></div>
+
+    <div class="section-header">
+      <span class="section-title">Accuracy Leaderboard</span>
+    </div>
+    <div id="chart-acc" class="chart-container"></div>
+
+    <div class="section-header">
+      <span class="section-title">Speed</span>
+    </div>
+    <div class="speed-grid">
+      <div>
+        <div class="chart-sublabel">P50 latency — lower is better</div>
+        <div id="chart-p50" class="chart-container"></div>
+      </div>
+      <div>
+        <div class="chart-sublabel">Tokens / sec — higher is better</div>
+        <div id="chart-tps" class="chart-container"></div>
+      </div>
+    </div>
+  ` : '';
+
+  $main.innerHTML = `
+    <div class="page-header">
+      <h1>Benchmarks</h1>
+      ${runSelector}
+    </div>
+
+    <div class="caveat-banner">
+      <strong>Small sample sizes.</strong>
+      These suites (5–10 prompts each) are sanity checks, not rigorous evaluations.
+      Results are directional signals — treat close scores as effectively tied.
+    </div>
+
+    ${chartsHtml}
+
+    <div class="section-header">
+      <span class="section-title">Full Results</span>
+    </div>
+    <div id="table-wrap" class="table-wrap"></div>
+  `;
+}
+
+// ─── CHART INITIALIZATION ─────────────────────────────────────────────────────
+
+function initCharts() {
+  if (!chartsEnabled) return;
+  scatterChart = echarts.init(document.getElementById('chart-scatter'), null, { renderer: 'canvas' });
+  accChart     = echarts.init(document.getElementById('chart-acc'),     null, { renderer: 'canvas' });
+  p50Chart     = echarts.init(document.getElementById('chart-p50'),     null, { renderer: 'canvas' });
+  tpsChart     = echarts.init(document.getElementById('chart-tps'),     null, { renderer: 'canvas' });
+
+  window.addEventListener('resize', () => {
+    scatterChart?.resize();
+    accChart?.resize();
+    p50Chart?.resize();
+    tpsChart?.resize();
+  });
+}
+
+function disposeCharts() {
+  scatterChart?.dispose(); scatterChart = null;
+  accChart?.dispose();     accChart     = null;
+  p50Chart?.dispose();     p50Chart     = null;
+  tpsChart?.dispose();     tpsChart     = null;
+}
+
+// ─── CHART OPTIONS ────────────────────────────────────────────────────────────
+
+function axisBase() {
+  return {
+    axisLine:  { lineStyle: { color: CB } },
+    axisTick:  { lineStyle: { color: CB } },
+    axisLabel: { color: CT, fontSize: 11 },
+    splitLine: { lineStyle: { color: CG } },
   };
+}
 
-  let runData    = {};   // model_id → metrics for active run
-  let modelMeta  = {};   // model_id → { name, description }
-  let activeSuite = 'overall';
-  let expanded    = new Set();
-  let runs        = [];  // available run dates, newest first
-
-  const $main = document.getElementById('main');
-
-  // ---------------------------------------------------------------------------
-  // Load
-  // ---------------------------------------------------------------------------
-
-  async function loadIndex() {
-    const res = await fetch('./benchmarks/index.json');
-    if (!res.ok) throw new Error('index not found');
-    runs = await res.json();
-    if (!runs.length) throw new Error('no runs yet');
-  }
-
-  async function loadRun(date) {
-    expanded.clear();
-    const res = await fetch(`./benchmarks/${date}.json`);
-    if (!res.ok) throw new Error(`run ${date} not found`);
-    runData = await res.json();
-    render(date);
-  }
-
-  async function loadModelMeta() {
-    try {
-      const res = await fetch('./models.json');
-      if (!res.ok) return;
-      const data = await res.json();
-      // Index by `key` (tunnel routing key, e.g. "lfm2thinking") — matches m.model in benchmark data
-      modelMeta = Object.fromEntries(
-        (data.models ?? [])
-          .filter(m => m.key)
-          .map(m => [m.key, { name: m.name, description: m.description, owned_by: m.owned_by }])
-      );
-    } catch { /* non-fatal */ }
-  }
-
-  async function init() {
-    try {
-      await Promise.all([loadIndex(), loadModelMeta()]);
-      await loadRun(runs[0]);
-    } catch (e) {
-      $main.innerHTML = `
-        <div class="state-wrap">
-          <p>${e.message === 'index not found' || e.message === 'no runs yet'
-            ? `No results yet. Trigger the <a href="https://github.com/lm-arena/lm-arena.github.io/actions/workflows/benchmark.yml" style="color:var(--accent)">benchmark workflow</a> to generate results.`
-            : `Failed to load: ${escHtml(e.message)}`
-          }</p>
-        </div>`;
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-  // Render
-  // ---------------------------------------------------------------------------
-
-  // Maps owned_by values from models.json to favicon domains.
-  // Update when adding new providers to config/models.py.
-  const FAVICON_DOMAINS = {
-    'qwen':           'qwen.ai',
-    'microsoft':      'microsoft.com',
-    'google':         'deepmind.google',
-    'huggingfacetb':  'huggingface.co',
-    'liquidai':       'liquid.ai',
-    'alibaba-apsara': 'alibabacloud.com',
-    'openbmb':        'openbmb.cn',
-    'janhq':          'jan.ai',
-    'meta':           'meta.com',
-    'tii':            'falconllm.tii.ae',
-    'essentialai':    'essential.ai',
-    'deepseek':       'deepseek.com',
-    'nanbeige':       'huggingface.co',
-    'openai':         'openai.com',
+function tooltipBase() {
+  return {
+    backgroundColor: '#1c2128',
+    borderColor: CB,
+    textStyle: { color: '#e6edf3', fontSize: 12 },
+    extraCssText: 'border-radius:6px',
   };
+}
 
-  function modelIcon(owned_by) {
-    const domain = FAVICON_DOMAINS[owned_by];
-    if (!domain) return '';
-    const src = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
-    return `<img class="model-icon" src="${src}" alt="" loading="lazy">`;
+function buildScatterOption(suite) {
+  const byProvider = {};
+  for (const m of Object.values(runData)) {
+    const meta = modelMeta[m.model] || {};
+    const provider = meta.owned_by || 'other';
+    const s = m.suites?.[suite];
+    if (!s || s.accuracy == null) continue;
+    if (!byProvider[provider]) byProvider[provider] = [];
+    byProvider[provider].push({
+      value: [s.p50_ms, s.accuracy],
+      modelName: meta.name ?? m.model,
+      tps: m.overall?.avg_tokens_per_sec ?? 0,
+      frac: `${s.correct ?? Math.round(s.accuracy * s.prompts)}/${s.prompts}`,
+      offline: m.functional === false,
+    });
   }
 
-  function fmt(v) {
-    if (v == null) return '<span class="na">—</span>';
-    return `<span class="val">${v}</span>`;
-  }
+  const series = Object.entries(byProvider).map(([provider, points]) => ({
+    name: provider,
+    type: 'scatter',
+    data: points.map(d => ({
+      value: d.value,
+      name: d.modelName,
+      tps: d.tps,
+      frac: d.frac,
+      offline: d.offline,
+      symbolSize: tpsToSize(d.tps),
+      itemStyle: d.offline
+        ? { color: 'transparent', borderColor: pColor(provider), borderWidth: 2 }
+        : { color: pColor(provider), opacity: 0.85 },
+    })),
+    emphasis: { scale: 1.2 },
+  }));
 
-  function renderTraces(modelId, suiteName) {
-    const suite = runData[modelId]?.suites?.[suiteName];
-    if (!suite?.traces?.length) return '<div class="traces-wrap"><p style="font-size:12px;color:var(--text-secondary)">No traces available.</p></div>';
+  if (!series.length) return {};
 
-    const items = suite.traces.map(t => {
-      let responseHtml;
-      if (t.response == null) {
-        responseHtml = `<div class="trace-response na">— no response —</div>`;
-      } else {
-        const thinkMatch = t.response.match(/^<think>([\s\S]*?)<\/think>\s*/);
-        if (thinkMatch) {
-          const thinking = thinkMatch[1].trim();
-          const answer = t.response.slice(thinkMatch[0].length).trim();
-          responseHtml = `
-            <details class="trace-think">
-              <summary>thinking</summary>
-              <div class="think-body">${escHtml(thinking)}</div>
-            </details>
-            ${answer ? `<div class="trace-response">${escHtml(answer)}</div>` : ''}`;
-        } else {
-          responseHtml = `<div class="trace-response">${escHtml(t.response)}</div>`;
-        }
-      }
-      return `
-      <div class="trace-item">
-        <div class="trace-prompt">${escHtml(t.prompt)}</div>
-        ${responseHtml}
-        <div class="trace-meta">
-          ${t.timed_out
-            ? `<span class="badge badge-offline">timeout</span>`
-            : t.responded === false
-            ? `<span class="badge badge-offline">empty</span>`
-            : `<span class="badge ${t.correct ? 'badge-pass' : 'badge-fail'}">${t.correct ? 'pass' : 'fail'}</span>`}
-          <span>expected: <span style="font-family:var(--font-mono)">${escHtml(t.expected)}</span></span>
-          ${t.latency_ms != null ? `<span>${t.latency_ms} ms</span>` : ''}
-        </div>
-      </div>`;
-    }).join('');
+  return {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'item',
+      ...tooltipBase(),
+      formatter: p => {
+        const d = p.data;
+        const accPct = Math.round(d.value[1] * 100);
+        const lat = fmtMs(d.value[0]);
+        return `<strong>${esc(d.name)}</strong><br/>`
+          + `${d.frac} correct — ${accPct}%<br/>`
+          + `P50 ${lat}<br/>`
+          + `TPS ${d.tps ? d.tps.toFixed(1) + ' t/s' : '—'}`
+          + (d.offline ? '<br/><span style="color:#8b949e">not responding</span>' : '');
+      },
+    },
+    legend: {
+      type: 'scroll',
+      bottom: 2,
+      textStyle: { color: CT, fontSize: 11 },
+      pageTextStyle: { color: CT },
+      pageIconColor: '#e6edf3',
+      itemWidth: 10, itemHeight: 10,
+    },
+    grid: { left: 52, right: 20, top: 16, bottom: 52 },
+    xAxis: {
+      type: 'log',
+      name: 'P50 latency',
+      nameLocation: 'middle',
+      nameGap: 28,
+      nameTextStyle: { color: CT, fontSize: 11 },
+      axisLabel: {
+        color: CT,
+        fontSize: 10,
+        formatter: v => v >= 1000 ? (v / 1000).toFixed(0) + 's' : v + 'ms',
+      },
+      ...axisBase(),
+    },
+    yAxis: {
+      type: 'value',
+      name: 'Accuracy',
+      nameLocation: 'middle',
+      nameGap: 42,
+      nameTextStyle: { color: CT, fontSize: 11 },
+      min: 0, max: 1,
+      axisLabel: { color: CT, fontSize: 10, formatter: v => Math.round(v * 100) + '%' },
+      ...axisBase(),
+    },
+    series,
+  };
+}
 
-    return `<div class="traces-wrap">
-      <div class="trace-header">${suiteName} — per-prompt traces</div>
-      ${items}
-    </div>`;
-  }
-
-  function render(activeDate) {
-    const models = Object.values(runData);
-    if (!models.length) {
-      $main.innerHTML = `<div class="state-wrap"><p>Run produced no results.</p></div>`;
-      return;
-    }
-
-    const sorted = [...models].sort((a, b) => {
-      if (activeSuite === 'overall') {
-        return (a.overall?.p50_ms ?? Infinity) - (b.overall?.p50_ms ?? Infinity);
-      }
-      const accDiff = (b.suites?.[activeSuite]?.accuracy ?? -1) - (a.suites?.[activeSuite]?.accuracy ?? -1);
-      if (accDiff !== 0) return accDiff;
-      return (a.suites?.[activeSuite]?.p50_ms ?? Infinity) - (b.suites?.[activeSuite]?.p50_ms ?? Infinity);
+function buildAccOption(suite) {
+  const rows = Object.values(runData)
+    .filter(m => m.suites?.[suite])
+    .map(m => {
+      const meta = modelMeta[m.model] || {};
+      const s = m.suites[suite];
+      return {
+        name: meta.name ?? m.model,
+        accuracy: s.accuracy ?? 0,
+        correct: s.correct ?? Math.round((s.accuracy ?? 0) * s.prompts),
+        total: s.prompts,
+        owned_by: meta.owned_by,
+        offline: m.functional === false,
+      };
+    })
+    .sort((a, b) => {
+      if (a.offline !== b.offline) return a.offline ? 1 : -1;
+      return b.accuracy - a.accuracy;
     });
 
-    const runSelector = runs.length > 1
-      ? `<select onchange="switchRun(this.value)">${
-          runs.map(r => `<option value="${r}"${r === activeDate ? ' selected' : ''}>${r}</option>`).join('')
-        }</select>`
-      : `<span style="font-size:12px;color:var(--text-secondary)">${activeDate}</span>`;
+  if (!rows.length) return {};
 
-    const tabs = SUITES.map(s => {
-      const info = SUITE_INFO[s];
-      const tooltip = `<div class="tip-box"><strong>${info.full ?? info.name}</strong>${info.desc}</div>`;
-      return `<div class="tab-wrap">
-        <button class="tab${s === activeSuite ? ' active' : ''}" onclick="setTab('${s}','${activeDate}')">${info.label}</button>
-        ${tooltip}
-      </div>`;
-    }).join('');
+  const h = Math.max(160, rows.length * 28 + 40);
+  const el = document.getElementById('chart-acc');
+  if (el) { el.style.height = h + 'px'; accChart?.resize(); }
 
-    let thead, rows;
+  return {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'none' },
+      ...tooltipBase(),
+      formatter: params => {
+        const p = params[0];
+        const d = p.data;
+        return `${esc(p.name)}<br/>${d.frac} correct (${Math.round(d.value * 100)}%)`
+          + (d.offline ? ' — not responding' : '');
+      },
+    },
+    grid: { left: 140, right: 60, top: 8, bottom: 8, containLabel: false },
+    xAxis: {
+      type: 'value', max: 1,
+      axisLabel: { color: CT, fontSize: 10, formatter: v => Math.round(v * 100) + '%' },
+      ...axisBase(),
+    },
+    yAxis: {
+      type: 'category',
+      data: rows.map(r => r.name),
+      inverse: true,
+      axisLabel: { color: CT, fontSize: 11, width: 130, overflow: 'truncate' },
+      axisLine: { show: false },
+      axisTick: { show: false },
+      splitLine: { show: false },
+    },
+    series: [{
+      type: 'bar',
+      barMaxWidth: 18,
+      data: rows.map(r => ({
+        value: r.accuracy,
+        frac: `${r.correct}/${r.total}`,
+        offline: r.offline,
+        itemStyle: { color: pColor(r.owned_by), opacity: r.offline ? 0.38 : 0.85 },
+        label: {
+          show: true,
+          position: 'right',
+          color: CT,
+          fontSize: 11,
+          formatter: p => p.data.frac,
+        },
+      })),
+    }],
+  };
+}
 
-    if (activeSuite === 'overall') {
-      thead = `<tr>
-        <th>Model</th>
-        <th>P50 latency</th>
-        <th>Max latency</th>
-        <th>Tokens/sec</th>
-      </tr>`;
-      rows = sorted.map(m => {
-        const o = m.overall || {};
-        const tps = o.avg_tokens_per_sec ?? 0;
-        const meta = modelMeta[m.model] || {};
-        const offline = m.functional === false;
-        return `<tr${offline ? ' class="row-offline"' : ''}>
-          <td>
-            <div class="model-cell">
-              ${modelIcon(meta.owned_by)}
-              <div>
-                <div class="model-name">${escHtml(meta.name ?? m.model)}${offline ? ' <span class="badge badge-offline">not responding</span>' : ''}</div>
-                ${meta.description ? `<div class="model-sub">${escHtml(meta.description)}</div>` : ''}
-              </div>
-            </div>
-          </td>
-          <td>${o.p50_ms != null ? fmt(o.p50_ms + ' ms') : fmt(null)}</td>
-          <td>${o.max_ms != null ? fmt(o.max_ms + ' ms') : fmt(null)}</td>
-          <td>${tps ? fmt(tps + ' ' + (m.tps_label || 't/s')) : fmt(null)}</td>
-        </tr>`;
-      }).join('');
+function buildP50Option() {
+  const rows = Object.values(runData)
+    .filter(m => m.overall?.p50_ms != null && m.overall.p50_ms > 0)
+    .map(m => {
+      const meta = modelMeta[m.model] || {};
+      return {
+        name: meta.name ?? m.model,
+        value: m.overall.p50_ms,
+        owned_by: meta.owned_by,
+        offline: m.functional === false,
+      };
+    })
+    .sort((a, b) => a.value - b.value);
+
+  if (!rows.length) return {};
+
+  const h = Math.max(160, rows.length * 28 + 40);
+  const el = document.getElementById('chart-p50');
+  if (el) { el.style.height = h + 'px'; p50Chart?.resize(); }
+
+  return {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'none' },
+      ...tooltipBase(),
+      formatter: params => `${esc(params[0].name)}<br/>P50 ${fmtMs(params[0].data.value)}`,
+    },
+    grid: { left: 140, right: 56, top: 8, bottom: 8, containLabel: false },
+    xAxis: {
+      type: 'value',
+      axisLabel: { color: CT, fontSize: 10, formatter: v => fmtMs(v) },
+      ...axisBase(),
+    },
+    yAxis: {
+      type: 'category',
+      data: rows.map(r => r.name),
+      inverse: false,
+      axisLabel: { color: CT, fontSize: 11, width: 130, overflow: 'truncate' },
+      axisLine: { show: false },
+      axisTick: { show: false },
+      splitLine: { show: false },
+    },
+    series: [{
+      type: 'bar',
+      barMaxWidth: 18,
+      data: rows.map(r => ({
+        value: r.value,
+        itemStyle: { color: pColor(r.owned_by), opacity: r.offline ? 0.38 : 0.85 },
+        label: {
+          show: true, position: 'right', color: CT, fontSize: 11,
+          formatter: p => fmtMs(p.data.value),
+        },
+      })),
+    }],
+  };
+}
+
+function buildTpsOption() {
+  const rows = Object.values(runData)
+    .filter(m => m.overall?.avg_tokens_per_sec > 0)
+    .map(m => {
+      const meta = modelMeta[m.model] || {};
+      return {
+        name: meta.name ?? m.model,
+        value: m.overall.avg_tokens_per_sec,
+        owned_by: meta.owned_by,
+        offline: m.functional === false,
+      };
+    })
+    .sort((a, b) => b.value - a.value);
+
+  if (!rows.length) return {};
+
+  const h = Math.max(160, rows.length * 28 + 40);
+  const el = document.getElementById('chart-tps');
+  if (el) { el.style.height = h + 'px'; tpsChart?.resize(); }
+
+  return {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'none' },
+      ...tooltipBase(),
+      formatter: params => `${esc(params[0].name)}<br/>${params[0].data.value.toFixed(1)} t/s`,
+    },
+    grid: { left: 140, right: 56, top: 8, bottom: 8, containLabel: false },
+    xAxis: {
+      type: 'value',
+      axisLabel: { color: CT, fontSize: 10, formatter: v => v.toFixed(0) },
+      ...axisBase(),
+    },
+    yAxis: {
+      type: 'category',
+      data: rows.map(r => r.name),
+      inverse: true,
+      axisLabel: { color: CT, fontSize: 11, width: 130, overflow: 'truncate' },
+      axisLine: { show: false },
+      axisTick: { show: false },
+      splitLine: { show: false },
+    },
+    series: [{
+      type: 'bar',
+      barMaxWidth: 18,
+      data: rows.map(r => ({
+        value: r.value,
+        itemStyle: { color: pColor(r.owned_by), opacity: r.offline ? 0.38 : 0.85 },
+        label: {
+          show: true, position: 'right', color: CT, fontSize: 11,
+          formatter: p => p.data.value.toFixed(1),
+        },
+      })),
+    }],
+  };
+}
+
+// ─── UPDATE ───────────────────────────────────────────────────────────────────
+
+function updateAccuracyCharts() {
+  if (!chartsEnabled) return;
+  scatterChart.setOption(buildScatterOption(activeSuite), { notMerge: true });
+  const accOpt = buildAccOption(activeSuite);
+  if (Object.keys(accOpt).length) accChart.setOption(accOpt, { notMerge: true });
+}
+
+function updateAllCharts() {
+  if (!chartsEnabled) return;
+  updateAccuracyCharts();
+  const p50Opt = buildP50Option();
+  if (Object.keys(p50Opt).length) p50Chart.setOption(p50Opt, { notMerge: true });
+  const tpsOpt = buildTpsOption();
+  if (Object.keys(tpsOpt).length) tpsChart.setOption(tpsOpt, { notMerge: true });
+}
+
+// ─── TABLE ────────────────────────────────────────────────────────────────────
+
+function sortedModels() {
+  const models = Object.values(runData);
+  return [...models].sort((a, b) => {
+    let va, vb;
+    const k = sortKey;
+    if (k === 'p50') {
+      va = a.overall?.p50_ms ?? Infinity;
+      vb = b.overall?.p50_ms ?? Infinity;
+    } else if (k === 'tps') {
+      va = a.overall?.avg_tokens_per_sec ?? 0;
+      vb = b.overall?.avg_tokens_per_sec ?? 0;
     } else {
-      thead = `<tr>
-        <th>Model</th>
-        <th>Accuracy</th>
-        <th>P50 latency</th>
-        <th></th>
-      </tr>`;
-      rows = sorted.flatMap(m => {
-        const s = m.suites?.[activeSuite] || {};
-        const acc = s.accuracy ?? null;
-        const pct = acc != null ? Math.round(acc * 100) : 0;
-        const key = `${m.model}:${activeSuite}`;
-        const isOpen = expanded.has(key);
+      va = a.suites?.[k]?.accuracy ?? -1;
+      vb = b.suites?.[k]?.accuracy ?? -1;
+    }
+    return sortAsc ? va - vb : vb - va;
+  });
+}
 
-        const accCell = acc != null
-          ? fmt(pct + '%') + (s.prompts != null ? ` <span style="color:var(--text-secondary);font-size:11px">(${Math.round(acc * s.prompts)}/${s.prompts})</span>` : '')
-          : fmt(null);
+function renderTable() {
+  const models = sortedModels();
 
-        const meta = modelMeta[m.model] || {};
-        const offline = m.functional === false;
-        const summaryRow = `<tr${offline ? ' class="row-offline"' : ''}>
-          <td>
-            <div class="model-cell">
-              ${modelIcon(meta.owned_by)}
-              <div>
-                <div class="model-name">${escHtml(meta.name ?? m.model)}${offline ? ' <span class="badge badge-offline">not responding</span>' : ''}</div>
-                ${meta.description ? `<div class="model-sub">${escHtml(meta.description)}</div>` : ''}
-              </div>
-            </div>
-          </td>
-          <td>${accCell}</td>
-          <td>${s.p50_ms != null ? fmt(s.p50_ms + ' ms') : fmt(null)}</td>
-          <td><button class="expand-btn" onclick="toggleTraces('${m.model}','${activeSuite}','${activeDate}')">${isOpen ? 'hide traces' : 'show traces'}</button></td>
-        </tr>`;
+  function thCls(key) {
+    if (sortKey !== key) return '';
+    return sortAsc ? ' class="sort-asc"' : ' class="sort-desc"';
+  }
 
-        const traceRow = isOpen ? `<tr class="traces-row"><td colspan="4">${renderTraces(m.model, activeSuite)}</td></tr>` : '';
-        return [summaryRow, traceRow].filter(Boolean).join('');
-      }).join('');
+  const thead = `<tr>
+    <th>Model</th>
+    <th class="suite-col" title="${esc(SUITE_INFO.mmlu.desc)}"${thCls('mmlu')} onclick="setSort('mmlu')">mini-MMLU</th>
+    <th class="suite-col" title="${esc(SUITE_INFO.instruct.desc)}"${thCls('instruct')} onclick="setSort('instruct')">Instruct</th>
+    <th class="suite-col" title="${esc(SUITE_INFO.gsm8k.desc)}"${thCls('gsm8k')} onclick="setSort('gsm8k')">mini-GSM8K</th>
+    <th class="num-col"${thCls('p50')} onclick="setSort('p50')">P50</th>
+    <th class="num-col"${thCls('tps')} onclick="setSort('tps')">TPS</th>
+  </tr>`;
+
+  const rows = models.flatMap(m => {
+    const meta = modelMeta[m.model] || {};
+    const offline = m.functional === false;
+
+    function suiteCell(sk) {
+      const s = m.suites?.[sk];
+      if (!s || s.accuracy == null) {
+        return `<td class="suite-col"><span style="color:var(--text-secondary)">—</span></td>`;
+      }
+      const pct = Math.round(s.accuracy * 100);
+      const correct = s.correct ?? Math.round(s.accuracy * s.prompts);
+      const ekey = `${m.model}:${sk}`;
+      const isOpen = expanded.has(ekey);
+      return `<td class="suite-col">
+        <span class="acc-pct">${pct}%</span>
+        <span class="acc-frac">${correct}/${s.prompts}</span>
+        <button class="expand-btn" onclick="toggleTraces('${m.model}','${sk}')">${isOpen ? 'hide' : 'traces'}</button>
+      </td>`;
     }
 
-    $main.innerHTML = `
-      <div class="page-header">
-        <h1>Benchmarks</h1>
-        ${runSelector}
-      </div>
-      <div class="suite-tabs">${tabs}</div>
-      <div class="table-wrap">
-        <table>
-          <thead>${thead}</thead>
-          <tbody>${rows}</tbody>
-        </table>
+    const p50 = m.overall?.p50_ms;
+    const tps = m.overall?.avg_tokens_per_sec;
+
+    const summaryRow = `<tr${offline ? ' class="row-offline"' : ''}>
+      <td>
+        <div class="model-cell">
+          ${modelIcon(meta.owned_by)}
+          <div>
+            <div class="model-name">${esc(meta.name ?? m.model)}${offline ? ' <span class="badge badge-offline">offline</span>' : ''}</div>
+            ${meta.description ? `<div class="model-sub">${esc(meta.description)}</div>` : ''}
+          </div>
+        </div>
+      </td>
+      ${suiteCell('mmlu')}
+      ${suiteCell('instruct')}
+      ${suiteCell('gsm8k')}
+      <td class="num-col">${p50 > 0 ? fmtMs(p50) : '<span style="color:var(--text-secondary)">—</span>'}</td>
+      <td class="num-col">${tps > 0 ? tps.toFixed(1) : '<span style="color:var(--text-secondary)">—</span>'}</td>
+    </tr>`;
+
+    const traceRows = ['mmlu', 'instruct', 'gsm8k'].map(sk => {
+      if (!expanded.has(`${m.model}:${sk}`)) return '';
+      return `<tr class="traces-row"><td colspan="6">${renderTraces(m.model, sk)}</td></tr>`;
+    }).join('');
+
+    return summaryRow + traceRows;
+  }).join('');
+
+  document.getElementById('table-wrap').innerHTML = `
+    <table>
+      <thead>${thead}</thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+// ─── TRACES ───────────────────────────────────────────────────────────────────
+
+function renderTraces(modelId, suiteName) {
+  const suite = runData[modelId]?.suites?.[suiteName];
+  if (!suite?.traces?.length) {
+    return '<div class="traces-wrap"><p style="font-size:12px;color:var(--text-secondary)">No traces available.</p></div>';
+  }
+
+  const suiteLabel = SUITE_INFO[suiteName]?.name ?? suiteName;
+
+  const items = suite.traces.map(t => {
+    let responseHtml;
+    if (t.response == null) {
+      responseHtml = `<div class="trace-response" style="color:var(--text-secondary)">— no response —</div>`;
+    } else {
+      const thinkMatch = t.response.match(/^<think>([\s\S]*?)<\/think>\s*/);
+      if (thinkMatch) {
+        const thinking = thinkMatch[1].trim();
+        const answer = t.response.slice(thinkMatch[0].length).trim();
+        responseHtml = `
+          <details class="trace-think">
+            <summary>thinking (${thinking.split(/\s+/).length} words)</summary>
+            <div class="think-body">${esc(thinking)}</div>
+          </details>
+          ${answer ? `<div class="trace-response">${esc(answer)}</div>` : ''}`;
+      } else {
+        responseHtml = `<div class="trace-response">${esc(t.response)}</div>`;
+      }
+    }
+
+    let verdictClass, verdictText;
+    if (t.timed_out) {
+      verdictClass = 'miss'; verdictText = 'timed out';
+    } else if (t.responded === false) {
+      verdictClass = 'miss'; verdictText = 'no response';
+    } else if (t.correct) {
+      verdictClass = 'pass'; verdictText = 'correct';
+    } else {
+      verdictClass = 'fail'; verdictText = 'incorrect';
+    }
+
+    return `
+      <div class="trace-item">
+        <div class="trace-prompt">${esc(t.prompt)}</div>
+        ${responseHtml}
+        <div class="trace-verdict ${verdictClass}">
+          Expected: <code>${esc(t.expected)}</code> — ${verdictText}
+        </div>
+        ${t.latency_ms != null ? `<div class="trace-latency">${t.latency_ms.toFixed(0)} ms</div>` : ''}
       </div>`;
+  }).join('');
+
+  return `<div class="traces-wrap">
+    <div class="trace-header">${esc(suiteLabel)} — per-prompt traces</div>
+    ${items}
+  </div>`;
+}
+
+// ─── HANDLERS ─────────────────────────────────────────────────────────────────
+
+function setPill(suite) {
+  activeSuite = suite;
+  document.querySelectorAll('#suite-pills .pill').forEach(b => {
+    b.classList.toggle('active', b.dataset.suite === suite);
+  });
+  updateAccuracyCharts();
+}
+
+async function switchRun(date) {
+  disposeCharts();
+  $main.innerHTML = '<div class="state-wrap"><div class="spinner"></div><p>Loading…</p></div>';
+  try {
+    await loadRun(date);
+    currentDate = date;
+    renderShell(date);
+    if (chartsEnabled) {
+      initCharts();
+      updateAllCharts();
+    }
+    renderTable();
+  } catch (e) {
+    $main.innerHTML = `<div class="state-wrap"><p>Failed to load run: ${esc(e.message)}</p></div>`;
   }
+}
 
-  // ---------------------------------------------------------------------------
-  // Interactions
-  // ---------------------------------------------------------------------------
+function toggleTraces(modelId, suite) {
+  const key = `${modelId}:${suite}`;
+  if (expanded.has(key)) expanded.delete(key);
+  else expanded.add(key);
+  renderTable();
+}
 
-  function setTab(suite, date) {
-    activeSuite = suite;
-    expanded.clear();
-    render(date);
+function setSort(key) {
+  if (sortKey === key) {
+    sortAsc = !sortAsc;
+  } else {
+    sortKey = key;
+    // Latency: ascending by default (lower is better); everything else: descending
+    sortAsc = key === 'p50';
   }
+  renderTable();
+}
 
-  function switchRun(date) {
-    $main.innerHTML = '<div class="state-wrap"><div class="spinner"></div><p>Loading…</p></div>';
-    loadRun(date);
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+
+async function init() {
+  try {
+    const [chartsOk] = await Promise.all([
+      loadScript(ECHARTS_CDN).then(() => true).catch(() => false),
+      loadModelMeta(),
+      loadIndex(),
+    ]);
+    chartsEnabled = chartsOk;
+    await loadRun(runs[0]);
+    currentDate = runs[0];
+    renderShell(currentDate);
+    if (chartsEnabled) {
+      initCharts();
+      updateAllCharts();
+    }
+    renderTable();
+  } catch (e) {
+    const msg = (e.message === 'index not found' || e.message === 'no runs yet')
+      ? `No results yet. Trigger the <a href="https://github.com/lm-arena/lm-arena.github.io/actions/workflows/benchmark.yml" style="color:var(--accent)">benchmark workflow</a> to generate results.`
+      : `Failed to load: ${esc(e.message)}`;
+    $main.innerHTML = `<div class="state-wrap"><p>${msg}</p></div>`;
   }
+}
 
-  function toggleTraces(modelId, suite, date) {
-    const key = `${modelId}:${suite}`;
-    if (expanded.has(key)) expanded.delete(key);
-    else expanded.add(key);
-    render(date);
-  }
-
-  function escHtml(s) {
-    return String(s ?? '')
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
-  init();
+init();
 </script>
 </body>
 </html>
