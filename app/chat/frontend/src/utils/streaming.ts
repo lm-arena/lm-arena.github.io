@@ -194,7 +194,7 @@ export async function* streamCompletion(
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
-  if (githubToken) {
+  if (githubToken && (!url || url.includes('github.ai'))) {
     headers['Authorization'] = `Bearer ${githubToken}`;
   }
 
@@ -231,6 +231,7 @@ export async function* readSseStream(
   const reader = body.getReader();
   const decoder = new TextDecoder();
   let buffer = '';
+  let yieldedDone = false;
 
   try {
     while (true) {
@@ -245,6 +246,7 @@ export async function* readSseStream(
         if (!line.startsWith('data: ')) continue;
         const data = line.slice(6);
         if (data === '[DONE]') {
+          yieldedDone = true;
           yield { type: 'done' };
           return;
         }
@@ -270,6 +272,7 @@ export async function* readSseStream(
     if (remaining.startsWith('data: ')) {
       const data = remaining.slice(6);
       if (data === '[DONE]') {
+        yieldedDone = true;
         yield { type: 'done' };
       } else {
         try {
@@ -286,6 +289,12 @@ export async function* readSseStream(
           // Skip malformed JSON
         }
       }
+    }
+
+    // If the server closed without sending [DONE], emit a fallback so callers
+    // that gate completion on event.type === 'done' are not silently dropped.
+    if (!yieldedDone) {
+      yield { type: 'done' };
     }
   } finally {
     reader.releaseLock();

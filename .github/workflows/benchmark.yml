@@ -45,7 +45,8 @@ jobs:
         env:
           TUNNEL_WRITE_KEY: ${{ secrets.TUNNEL_WRITE_KEY }}
           REGISTRY: https://tunnel-registry.jonasneves.workers.dev
-        run: python scripts/benchmark.py --model ${{ matrix.model }}
+          MODEL: ${{ matrix.model }}
+        run: python scripts/benchmark.py --model "$MODEL"
       - uses: actions/upload-artifact@v4
         with:
           name: result-${{ matrix.model }}

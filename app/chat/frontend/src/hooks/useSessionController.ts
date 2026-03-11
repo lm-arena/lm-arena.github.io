@@ -523,7 +523,7 @@ export function useSessionController(params: SessionControllerParams) {
 
           const responseText = event.response ?? '';
           const turnNum = event.turn_number ?? 0;
-          recordResponse(modelId, responseText, { replace: true });
+          recordResponse(modelId, responseText);
           setModelsData(prev => prev.map(model =>
             model.id === modelId ? { ...model, response: responseText } : model
           ));
