@@ -23,7 +23,7 @@ help:
 	@echo ""
 	@echo "\033[2mInference (GitHub Actions)\033[0m"
 	@echo "  \033[36minference\033[0m       Run MODEL=<name> [HOURS=5]"
-	@echo "  \033[36mbuild-images\033[0m    Build Docker images [MODELS=all] [NO_CACHE=false]"
+	@echo "  \033[36mbuild-images\033[0m    Build Docker images [MODELS=all|<inference-dir,...>] [NO_CACHE=false]"
 	@echo "  \033[36mup\033[0m              Launch all inference models [HOURS=5]"
 	@echo "  \033[36mdown\033[0m            Cancel all in-progress workflow runs"
 	@echo ""
