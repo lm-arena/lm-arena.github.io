@@ -1,7 +1,13 @@
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { Model } from '../types';
-import { MODEL_META } from '../constants';
 import { usePersistedSetting } from './usePersistedSetting';
+
+// Stable per-model color derived from its id — gives each model a distinct hue
+function modelColor(seed: string): string {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) & 0xffff;
+  return `hsl(${h % 360}, 65%, 55%)`;
+}
 import servicesConfig from '../data/services.json';
 
 const SERVICES = servicesConfig.services as { key: string; modelId: string; localPort: number }[];
@@ -68,11 +74,10 @@ export function useModelsManager() {
         .map((model) => {
           const modelType: 'self-hosted' | 'github' =
             (model.type === 'github' || model.type === 'api') ? 'github' : 'self-hosted';
-          const meta = MODEL_META[modelType];
           return {
             id: model.id,
-            name: meta.name || model.name || model.id,
-            color: meta.color,
+            name: model.name || model.id,
+            color: modelColor(model.id),
             type: modelType,
             response: '',
             priority: model.priority,

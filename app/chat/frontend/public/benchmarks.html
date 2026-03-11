@@ -333,9 +333,14 @@
       return;
     }
 
-    const sorted = [...models].sort((a, b) =>
-      (a.overall?.p50_ms ?? Infinity) - (b.overall?.p50_ms ?? Infinity)
-    );
+    const sorted = [...models].sort((a, b) => {
+      if (activeSuite === 'overall') {
+        return (a.overall?.p50_ms ?? Infinity) - (b.overall?.p50_ms ?? Infinity);
+      }
+      const accDiff = (b.suites?.[activeSuite]?.accuracy ?? -1) - (a.suites?.[activeSuite]?.accuracy ?? -1);
+      if (accDiff !== 0) return accDiff;
+      return (a.suites?.[activeSuite]?.p50_ms ?? Infinity) - (b.suites?.[activeSuite]?.p50_ms ?? Infinity);
+    });
 
     const runSelector = runs.length > 1
       ? `<select onchange="switchRun(this.value)">${
@@ -378,7 +383,7 @@
           </td>
           <td>${o.p50_ms != null ? fmt(o.p50_ms + ' ms') : fmt(null)}</td>
           <td>${o.max_ms != null ? fmt(o.max_ms + ' ms') : fmt(null)}</td>
-          <td>${tps ? fmt(tps + ' t/s') : fmt(null)}</td>
+          <td>${tps ? fmt(tps + ' ' + (m.tps_label || 't/s')) : fmt(null)}</td>
         </tr>`;
       }).join('');
     } else {

@@ -5,7 +5,7 @@ import PromptInput from './PromptInput';
 import { Bot, AlertTriangle, User, Check, Copy, Shuffle, ChevronDown } from 'lucide-react';
 import { extractTextWithoutJSON } from '../hooks/useGestureOptions';
 import GestureOptions from './GestureOptions';
-import { fetchChatStream, streamSseEvents } from '../utils/streaming';
+import { fetchChatStream } from '../utils/streaming';
 import ModelTabs from './ModelTabs';
 import { useGestureOptional } from '../context/GestureContext';
 import ExecutionTimeDisplay, { ExecutionTimeData } from './ExecutionTimeDisplay';
@@ -346,21 +346,21 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
                 let hasError = false;
                 let routingInfo: RoutingInfo | undefined;
 
-                await streamSseEvents(stream, (event) => {
+                for await (const event of stream) {
                     if (event.event === 'routing') {
                         routingInfo = {
                             routed_to: String(event.routed_to ?? ''),
                             category: String(event.category ?? 'general'),
                             classifier: event.classifier ? String(event.classifier) : null,
                         };
-                        return;
+                        continue;
                     }
                     if (event.event === 'error' || event.error === true) {
                         hasError = true;
                         content = typeof event.content === 'string' ? event.content : 'An error occurred';
                         streamingContentRef.current.set(modelId, content);
                         syncStreamingState();
-                        return;
+                        continue;
                     }
                     if (event.content) {
                         if (firstToken) {
@@ -373,7 +373,7 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
                         streamingContentRef.current.set(modelId, content);
                         syncStreamingState();
                     }
-                });
+                }
 
                 const endTime = Date.now();
 

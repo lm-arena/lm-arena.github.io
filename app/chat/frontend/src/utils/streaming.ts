@@ -127,14 +127,6 @@ export function fetchChatStream(
   );
 }
 
-export async function streamSseEvents(
-  eventStream: AsyncGenerator<ChatStreamEvent>,
-  onEvent: (data: ChatStreamEvent) => void,
-): Promise<void> {
-  for await (const event of eventStream) {
-    onEvent(event);
-  }
-}
 
 export type SseDeltaEvent =
   | { type: 'chunk'; content: string }

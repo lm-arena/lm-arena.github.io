@@ -390,14 +390,14 @@
 
       const entry = tunnelMap[m.key];
       const runnerAccount = entry?.runner_account;
-      const runnerBadge = runnerAccount ? `<span class="runner-badge">${runnerAccount}</span>` : '';
+      const runnerBadge = runnerAccount ? `<span class="runner-badge">${esc(runnerAccount)}</span>` : '';
 
       return `
         <div class="model-card${isRunning ? ' running' : ''}">
           <div class="status-dot ${dotClass}"></div>
           <div class="model-info">
-            <div class="model-name">${m.name}</div>
-            <div class="model-key">${m.key}</div>
+            <div class="model-name">${esc(m.name)}</div>
+            <div class="model-key">${esc(m.key)}</div>
           </div>
           ${runnerBadge}
           <span class="model-status${isRunning ? ' running' : ''}">${statusText}</span>
@@ -423,12 +423,19 @@
 
   // ── Helpers ───────────────────────────────────────────────────────────
 
+  const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+  let _toast = null;
+  let _toastTimer = null;
   function showToast(msg, type = 'info') {
-    const el = document.createElement('div');
-    el.className = `toast ${type === 'error' ? 'toast-error' : 'toast-info'}`;
-    el.textContent = msg;
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 4000);
+    if (!_toast) {
+      _toast = document.createElement('div');
+      document.body.appendChild(_toast);
+    }
+    _toast.className = `toast ${type === 'error' ? 'toast-error' : 'toast-info'}`;
+    _toast.textContent = msg;
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(() => { _toast.remove(); _toast = null; }, 4000);
   }
 
   init();

@@ -6,7 +6,7 @@ const ICON_WARNING = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none
 const escapeHtml = (t: string) =>
   t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 import { GENERATION_DEFAULTS, isThinkingModel } from '../constants';
-import { fetchChatStream, streamSseEvents } from '../utils/streaming';
+import { fetchChatStream } from '../utils/streaming';
 import { ChatHistoryEntry, Mode, Model } from '../types';
 import { ExecutionTimeData } from '../components/ExecutionTimeDisplay';
 import { parseThinkingChunk, ThinkingState } from '../utils/thinkingParser';
@@ -235,6 +235,25 @@ export function useSessionController(params: SessionControllerParams) {
       return escapeHtml(message);
     };
 
+    const finalizeModel = (modelId: string, errorText: string | null, failed: boolean) => {
+      const now = performance.now();
+      setExecutionTimes(prev => ({
+        ...prev,
+        [modelId]: { ...prev[modelId], endTime: now },
+      }));
+      setSpeaking(prev => {
+        const next = new Set(prev);
+        next.delete(modelId);
+        return next;
+      });
+      if (failed && errorText !== null) {
+        setModelsData(prev => prev.map(model =>
+          model.id === modelId ? { ...model, response: errorText, error: errorText } : model,
+        ));
+        markModelFailed(modelId);
+      }
+    };
+
     const handleCompare = async () => {
       setSpeaking(new Set(sessionModelIds));
 
@@ -254,7 +273,7 @@ export function useSessionController(params: SessionControllerParams) {
         modelKeys: modelKeyMap,
       }, currentController.signal);
 
-      await streamSseEvents(response, (data) => {
+      for await (const data of response) {
         if (data.event === 'info' && data.content) {
           const rawMessage = String(data.content);
           const messageWithIcon = addIconToMessage(rawMessage);
@@ -288,37 +307,15 @@ export function useSessionController(params: SessionControllerParams) {
 
         if (data.event === 'error' && data.model_id) {
           const modelId = data.model_id as string;
-          const now = performance.now();
           const errorText = String(data.content ?? 'Error generating response.');
-          setExecutionTimes(prev => ({
-            ...prev,
-            [modelId]: { ...prev[modelId], endTime: now },
-          }));
-          setSpeaking(prev => {
-            const next = new Set(prev);
-            next.delete(modelId);
-            return next;
-          });
-          setModelsData(prev => prev.map(model =>
-            model.id === modelId ? { ...model, response: errorText, error: errorText } : model,
-          ));
-          markModelFailed(modelId);
+          finalizeModel(modelId, errorText, true);
         }
 
         if (data.event === 'done' && data.model_id) {
-          const now = performance.now();
           const modelId = data.model_id as string;
-          setExecutionTimes(prev => ({
-            ...prev,
-            [modelId]: { ...prev[modelId], endTime: now },
-          }));
-          setSpeaking(prev => {
-            const next = new Set(prev);
-            next.delete(modelId);
-            return next;
-          });
+          finalizeModel(modelId, null, false);
         }
-      });
+      }
 
       if (!skipHistory) {
         const summary = summarizeSessionResponses(sessionResponses, sessionModelIds);
@@ -386,16 +383,7 @@ export function useSessionController(params: SessionControllerParams) {
 
         if (eventType === 'model_response' && event.model_id) {
           const modelId = event.model_id;
-          const now = performance.now();
-          setExecutionTimes(prev => ({
-            ...prev,
-            [modelId]: { ...prev[modelId], endTime: now },
-          }));
-          setSpeaking(prev => {
-            const next = new Set(prev);
-            next.delete(modelId);
-            return next;
-          });
+          finalizeModel(modelId, null, false);
 
           const responseText = event.response ?? '';
           recordResponse(modelId, responseText, { replace: true });
@@ -407,20 +395,9 @@ export function useSessionController(params: SessionControllerParams) {
 
         if (eventType === 'model_error' && event.model_id) {
           const modelId = event.model_id;
-          const now = performance.now();
-          setExecutionTimes(prev => ({
-            ...prev,
-            [modelId]: { ...prev[modelId], endTime: now },
-          }));
-          setSpeaking(prev => {
-            const next = new Set(prev);
-            next.delete(modelId);
-            return next;
-          });
           const errorText = event.error ?? 'Error generating response.';
           clearPendingStreamForModel(modelId);
-          setModelsData(prev => prev.map(model => model.id === modelId ? { ...model, response: errorText, error: errorText } : model));
-          markModelFailed(modelId);
+          finalizeModel(modelId, errorText, true);
           recordResponse(modelId, errorText, { replace: true });
         }
 
@@ -526,16 +503,7 @@ export function useSessionController(params: SessionControllerParams) {
 
         if (eventType === 'turn_complete' && event.model_id) {
           const modelId = event.model_id;
-          const now = performance.now();
-          setExecutionTimes(prev => ({
-            ...prev,
-            [modelId]: { ...prev[modelId], endTime: now },
-          }));
-          setSpeaking(prev => {
-            const next = new Set(prev);
-            next.delete(modelId);
-            return next;
-          });
+          finalizeModel(modelId, null, false);
 
           const responseText = event.response ?? '';
           const turnNum = event.turn_number ?? 0;
@@ -554,22 +522,9 @@ export function useSessionController(params: SessionControllerParams) {
 
         if (eventType === 'turn_error' && event.model_id) {
           const modelId = event.model_id;
-          const now = performance.now();
-          setExecutionTimes(prev => ({
-            ...prev,
-            [modelId]: { ...prev[modelId], endTime: now },
-          }));
-          setSpeaking(prev => {
-            const next = new Set(prev);
-            next.delete(modelId);
-            return next;
-          });
           const errorText = event.error ?? 'Turn error.';
           clearPendingStreamForModel(modelId);
-          setModelsData(prev => prev.map(model =>
-            model.id === modelId ? { ...model, response: errorText, error: errorText } : model
-          ));
-          markModelFailed(modelId);
+          finalizeModel(modelId, errorText, true);
         }
 
         if (eventType === 'debate_complete') {

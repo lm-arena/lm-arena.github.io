@@ -1,10 +1,5 @@
 import { BackgroundStyle, Mode, Model, TopicPack, TopicPrompt, TrendingTopic } from './types';
 
-export const MODEL_META: Record<string, { color: string; name?: string }> = {
-  'self-hosted': { color: '#10b981' }, // Green for self-hosted models
-  'github': { color: '#3b82f6' },      // Blue for GitHub Models
-};
-
 export const SELF_HOSTED_DEFAULT_PRIORITY = 50;
 export const GITHUB_DEFAULT_PRIORITY = 100;
 

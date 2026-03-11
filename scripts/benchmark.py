@@ -198,11 +198,12 @@ def benchmark_model(model_id):
             "run_at": datetime.now(timezone.utc).isoformat(),
             "functional": False,
             "suites": {},
-            "overall": {"p50_ms": None, "max_ms": None, "avg_tokens_per_sec": None},
+            "overall": {"p50_ms": None, "max_ms": None, "avg_tokens_per_sec": None, "tps_label": None},
         }
 
     all_latencies = []
     all_tps = []
+    all_tps_labels = []
     suites_out = {}
 
     for suite_name, prompts, strict in SUITES:
@@ -215,6 +216,7 @@ def benchmark_model(model_id):
             lat       = result["latency_ms"]
             tps       = result["tps"]
             timed_out = result["timed_out"]
+            all_tps_labels.append(result["tps_label"])
 
             responded = text is not None and bool(text.strip())
             correct   = exact_match(text, expected) if responded else False
@@ -255,6 +257,7 @@ def benchmark_model(model_id):
     total_prompts   = sum(len(p) for _, p, _ in SUITES)
     total_responded = sum(t["responded"] for s in suites_out.values() for t in s["traces"])
     functional      = (total_responded / total_prompts) > 0.5 if total_prompts else False
+    tps_label       = "tokens/s" if all_tps_labels and all(l == "tokens/s" for l in all_tps_labels) else "chunks/s"
 
     return {
         "model":    model_id,
@@ -266,6 +269,7 @@ def benchmark_model(model_id):
             "p50_ms":            round(statistics.median(all_latencies), 1) if all_latencies else None,
             "max_ms":            round(max(all_latencies), 1) if all_latencies else None,
             "avg_tokens_per_sec": round(statistics.mean(all_tps), 1) if all_tps else None,
+            "tps_label":         tps_label,
         },
     }
 
