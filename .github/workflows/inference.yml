@@ -18,8 +18,10 @@ run-name: "${{ inputs.model }}"
           - r1qwen
           - lfm2mini
           - gemma
+          - qwen14b
           - falcon
           - jancode
+          - qwen7b
           - phi
           - rnj
           - llama
