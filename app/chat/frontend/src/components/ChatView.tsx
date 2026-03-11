@@ -277,7 +277,7 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
 
         userScrolledAwayRef.current = false;
 
-        const now = Date.now();
+        const now = performance.now();
         const initialContent = new Map(modelIds.map(id => [id, ''] as const));
         const initialTiming = new Map(modelIds.map(id => [id, { startTime: now }] as const));
 
@@ -320,7 +320,7 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
 
         const streamPromises = modelIds.map(async (modelId) => {
             const model = modelMap.get(modelId);
-            const startTime = Date.now();
+            const startTime = performance.now();
 
             if (!model) {
                 appendAssistantMessage({ content: `Model ${modelId} not found`, modelId, modelName: modelId, error: true });
@@ -368,7 +368,7 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
                     if (event.event === 'token') {
                         if (firstToken) {
                             firstToken = false;
-                            firstTokenTime = Date.now();
+                            firstTokenTime = performance.now();
                             const existing = streamingTimingRef.current.get(modelId) || { startTime };
                             streamingTimingRef.current.set(modelId, { ...existing, firstTokenTime });
                         }
@@ -378,7 +378,7 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
                     }
                 }
 
-                const endTime = Date.now();
+                const endTime = performance.now();
 
                 appendAssistantMessage({
                     content: content || '(empty response)',

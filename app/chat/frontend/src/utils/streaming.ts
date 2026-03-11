@@ -129,24 +129,46 @@ export async function* mergeAsyncGenerators<T>(
   type Entry = {
     gen: AsyncGenerator<T>;
     idx: number;
-    next: Promise<{ result: IteratorResult<T>; idx: number }>;
+    next: Promise<{ result: IteratorResult<T>; idx: number; error?: unknown }>;
   };
 
-  const active: Entry[] = generators.map((gen, idx) => ({
-    gen,
-    idx,
-    next: gen.next().then(result => ({ result, idx })),
-  }));
+  function makeNext(entry: Entry): Promise<{ result: IteratorResult<T>; idx: number; error?: unknown }> {
+    const { gen, idx } = entry;
+    return gen.next().then(
+      result => ({ result, idx }),
+      error => ({ result: { value: undefined, done: true } as IteratorResult<T>, idx, error }),
+    );
+  }
+
+  const active: Entry[] = generators.map((gen, idx) => {
+    const entry: Entry = { gen, idx, next: undefined! };
+    entry.next = makeNext(entry);
+    return entry;
+  });
 
   while (active.length > 0) {
-    const { result, idx } = await Promise.race(active.map(e => e.next));
+    const { result, idx, error } = await Promise.race(active.map(e => e.next));
     const entryIdx = active.findIndex(e => e.idx === idx);
+
+    if (error !== undefined) {
+      // Remove the failing generator from the active set.
+      active.splice(entryIdx, 1);
+      if (error instanceof Error && error.name === 'AbortError') {
+        // User cancelled — clean up all remaining generators and stop.
+        for (const entry of active) {
+          entry.gen.return?.(undefined);
+        }
+        return;
+      }
+      // Non-abort error from one generator: skip it, continue with the rest.
+      continue;
+    }
 
     if (result.done) {
       active.splice(entryIdx, 1);
     } else {
       yield result.value;
-      active[entryIdx].next = active[entryIdx].gen.next().then(result => ({ result, idx }));
+      active[entryIdx].next = makeNext(active[entryIdx]);
     }
   }
 }

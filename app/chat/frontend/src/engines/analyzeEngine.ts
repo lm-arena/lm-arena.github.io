@@ -207,12 +207,19 @@ export async function* runAnalyze(params: AnalyzeParams): AsyncGenerator<Analyze
         }
       }
     } catch (error: unknown) {
-      if (error instanceof Error && error.name !== 'AbortError') {
+      if (error instanceof Error && error.name === 'AbortError') {
         yield {
           type: 'model_error' as const,
           model_id: modelId,
           model_name: modelName,
-          error: error.message,
+          error: 'aborted',
+        };
+      } else {
+        yield {
+          type: 'model_error' as const,
+          model_id: modelId,
+          model_name: modelName,
+          error: error instanceof Error ? error.message : 'Unknown error',
         };
       }
     }
@@ -224,7 +231,7 @@ export async function* runAnalyze(params: AnalyzeParams): AsyncGenerator<Analyze
     yield event;
   }
 
-  if (results.length === 0) {
+  if (results.length === 0 && !signal.aborted) {
     yield { type: 'error', error: 'All models failed' };
     return;
   }

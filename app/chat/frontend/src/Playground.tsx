@@ -300,7 +300,9 @@ function PlaygroundInner() {
       const startAngle = 250;
       const endAngle = 470;
       const angleRange = endAngle - startAngle;
-      const angle = (startAngle + (index * angleRange / (total - 1))) - 90;
+      const angle = total === 1
+        ? startAngle - 90
+        : (startAngle + (index * angleRange / (total - 1))) - 90;
       const rad = angle * Math.PI / 180;
       return {
         x: Math.cos(rad) * radius,
@@ -1054,9 +1056,9 @@ function PlaygroundInner() {
                     const rect = modeTrack.getBoundingClientRect();
                     const relativeX = hoverX - rect.left;
                     const trackWidth = rect.width;
-                    const modeIndex = Math.floor((relativeX / trackWidth) * 5); // 5 modes
+                    const modeIndex = Math.floor((relativeX / trackWidth) * 4);
                     const modes: Mode[] = ['chat', 'compare', 'analyze', 'debate'];
-                    const targetMode = modes[Math.max(0, Math.min(4, modeIndex))];
+                    const targetMode = modes[Math.max(0, Math.min(3, modeIndex))];
 
                     if (targetMode && targetMode !== mode) {
                       handleModeChange(targetMode);

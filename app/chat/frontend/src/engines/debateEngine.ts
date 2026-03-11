@@ -195,11 +195,17 @@ async function* executeTurn(params: ExecuteTurnParams): AsyncGenerator<DebateEve
       }
     }
   } catch (error: unknown) {
-    if (error instanceof Error && error.name !== 'AbortError') {
+    if (error instanceof Error && error.name === 'AbortError') {
       yield {
         type: 'turn_error',
         model_id: modelId,
-        error: error.message,
+        error: 'aborted',
+      };
+    } else {
+      yield {
+        type: 'turn_error',
+        model_id: modelId,
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
