@@ -65,7 +65,7 @@ function PlaygroundInner() {
     {
       serialize: value => value,
       deserialize: (stored, fallback) => {
-        const validModes: Mode[] = ['chat', 'compare', 'analyze', 'debate'];
+        const validModes: Mode[] = ['chat', 'compare', 'analyze', 'debate', 'benchmark'];
         return validModes.includes(stored as Mode) ? (stored as Mode) : fallback;
       },
     },
@@ -239,7 +239,7 @@ function PlaygroundInner() {
 
   const selectedModelsBase = selected
     .map(id => modelsData.find(m => m.id === id))
-    .filter((m): m is Model => !!m && (mode === 'compare' || m.id !== moderator));
+    .filter((m): m is Model => !!m && (mode === 'compare' || mode === 'benchmark' || m.id !== moderator));
 
   const selectedModels = useMemo(() => {
     if (mode !== 'compare') return selectedModelsBase;
@@ -622,9 +622,14 @@ function PlaygroundInner() {
     const limit = SMART_DEFAULT_LIMITS[targetMode];
     if (limit === undefined) return [];
 
-    const available = modelsData
+    // Prefer online models; fall back to all if registry hasn't resolved yet
+    const onlineAvailable = modelsData
       .filter(m => m.id !== 'auto' && onlineModelIds.has(m.id))
       .map(m => m.id);
+
+    const available = onlineAvailable.length > 0
+      ? onlineAvailable
+      : modelsData.filter(m => m.id !== 'auto').map(m => m.id);
 
     return available.slice(0, limit);
   }, [modelsData, onlineModelIds]);
