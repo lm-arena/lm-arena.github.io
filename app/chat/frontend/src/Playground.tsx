@@ -157,7 +157,9 @@ function PlaygroundInner() {
     {
       serialize: value => value,
       deserialize: (stored, fallback) =>
-        ['quick', 'balanced', 'full'].includes(stored) ? (stored as BenchmarkProfile) : fallback,
+        typeof stored === 'string' && ['quick', 'balanced', 'full'].includes(stored)
+          ? (stored as BenchmarkProfile)
+          : fallback,
     },
   );
 
