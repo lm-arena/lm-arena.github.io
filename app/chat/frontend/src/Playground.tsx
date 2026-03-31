@@ -91,6 +91,8 @@ function PlaygroundInner() {
   }, [setGithubAuth]);
 
   const [uiBuilderEnabled, setUiBuilderEnabled] = useState(false);
+  const [customSystemPrompt, setCustomSystemPrompt] = useState('');
+  const [customSystemPromptEnabled, setCustomSystemPromptEnabled] = useState(false);
   const [executionTimes, setExecutionTimes] = useState<Record<string, ExecutionTimeData>>({});
   const dockRef = useRef<HTMLDivElement>(null);
 
@@ -826,7 +828,7 @@ function PlaygroundInner() {
     selectedCardIds,
     githubToken: githubAuth?.token,
     isGenerating,
-    systemPrompt: uiBuilderEnabled ? UI_BUILDER_PROMPT : undefined,
+    systemPrompt: uiBuilderEnabled ? UI_BUILDER_PROMPT : (customSystemPromptEnabled && customSystemPrompt ? customSystemPrompt : undefined),
     summarizeSessionResponses,
     setLastQuery,
     setHoveredCard,
@@ -1228,6 +1230,7 @@ function PlaygroundInner() {
                     getModelEndpoints={getModelEndpoints}
                     modelKeyMap={modelKeyMap}
                     onlineModelIds={onlineModelIds}
+                    systemPrompt={customSystemPromptEnabled && customSystemPrompt ? customSystemPrompt : undefined}
                   />
                 </Suspense>
               </ErrorBoundary>
@@ -1385,6 +1388,10 @@ function PlaygroundInner() {
           setGithubAuth={setGithubAuth}
           bgStyle={bgStyle}
           setBgStyle={setBgStyle}
+          systemPrompt={customSystemPrompt}
+          setSystemPrompt={setCustomSystemPrompt}
+          systemPromptEnabled={customSystemPromptEnabled}
+          setSystemPromptEnabled={setCustomSystemPromptEnabled}
         />
       </Suspense>
 

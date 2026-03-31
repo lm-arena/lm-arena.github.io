@@ -52,6 +52,7 @@ interface ChatViewProps {
     getModelEndpoints: (models: Model[]) => Record<string, string>;
     modelKeyMap: Record<string, string>;
     onlineModelIds?: Set<string>;
+    systemPrompt?: string;
 }
 
 const CATEGORY_STYLE: Record<string, { border: string; bg: string; text: string; label: string }> = {
@@ -177,6 +178,7 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
     getModelEndpoints,
     modelKeyMap,
     onlineModelIds,
+    systemPrompt,
 }, ref) => {
     const [inputFocused, setInputFocused] = useState(false);
     const [copiedMessageId, setCopiedMessageId] = useState<number | null>(null);
@@ -295,6 +297,10 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
 
         const systemPrompts: Array<{ role: 'system'; content: string }> = [];
 
+        if (systemPrompt) {
+            systemPrompts.push({ role: 'system', content: systemPrompt });
+        }
+
         if (uiBuilderEnabled) {
             systemPrompts.push({ role: 'system', content: UI_BUILDER_PROMPT });
         }
@@ -404,7 +410,7 @@ const ChatView = forwardRef<ChatViewHandle, ChatViewProps>(({
         });
 
         await Promise.allSettled(streamPromises);
-    }, [isGenerating, selectedModels, modelMap, githubToken, uiBuilderEnabled, setMessages, setIsGenerating, syncStreamingState, getModelEndpoints, models, modelKeyMap]);
+    }, [isGenerating, selectedModels, modelMap, githubToken, uiBuilderEnabled, systemPrompt, setMessages, setIsGenerating, syncStreamingState, getModelEndpoints, models, modelKeyMap]);
 
     const stopGeneration = useCallback(() => {
         abortRefs.current.forEach(c => c.abort());

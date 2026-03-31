@@ -12,6 +12,10 @@ interface SettingsModalProps {
   setGithubAuth: (auth: GitHubAuth | null) => void;
   bgStyle: BackgroundStyle;
   setBgStyle: (style: BackgroundStyle) => void;
+  systemPrompt: string;
+  setSystemPrompt: (prompt: string) => void;
+  systemPromptEnabled: boolean;
+  setSystemPromptEnabled: (enabled: boolean) => void;
 }
 
 // Display labels for background styles
@@ -54,6 +58,10 @@ export default function SettingsModal({
   setGithubAuth,
   bgStyle,
   setBgStyle,
+  systemPrompt,
+  setSystemPrompt,
+  systemPromptEnabled,
+  setSystemPromptEnabled,
 }: SettingsModalProps) {
   const [activeTab, setActiveTab] = useState<SettingsTab>('general');
   const [isConnecting, setIsConnecting] = useState(false);
@@ -174,6 +182,36 @@ export default function SettingsModal({
           {/* General Tab */}
           {activeTab === 'general' && (
             <>
+              {/* System Prompt Section */}
+              <div className="rounded-xl border border-slate-800/60 bg-slate-900/60 p-4">
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="text-sm font-semibold text-slate-200">System Prompt</h3>
+                  <button
+                    onClick={() => setSystemPromptEnabled(!systemPromptEnabled)}
+                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${systemPromptEnabled ? 'bg-blue-500' : 'bg-slate-700'}`}
+                    aria-checked={systemPromptEnabled}
+                    role="switch"
+                    aria-label="Enable system prompt"
+                  >
+                    <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${systemPromptEnabled ? 'translate-x-4.5' : 'translate-x-0.5'}`} />
+                  </button>
+                </div>
+                <p className="text-xs text-slate-400 leading-relaxed mb-3">
+                  Injected as the first message in every request. Disable for unmodified model behavior.
+                </p>
+                <textarea
+                  value={systemPrompt}
+                  onChange={e => setSystemPrompt(e.target.value)}
+                  disabled={!systemPromptEnabled}
+                  placeholder="You are a helpful assistant..."
+                  rows={5}
+                  className={`w-full rounded-lg border px-3 py-2 text-sm font-mono resize-y transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 ${systemPromptEnabled
+                    ? 'bg-slate-800/60 border-slate-700/60 text-slate-200 placeholder-slate-500'
+                    : 'bg-slate-800/30 border-slate-800/40 text-slate-500 placeholder-slate-600 cursor-not-allowed'
+                  }`}
+                />
+              </div>
+
               {/* GitHub Connection Section */}
               <div className="rounded-xl border border-slate-800/60 bg-slate-900/60 p-4">
                 <h3 className="text-sm font-semibold text-slate-200 mb-1">GitHub Connection</h3>
