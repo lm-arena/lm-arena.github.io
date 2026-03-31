@@ -100,6 +100,17 @@
       "routing_category": "general"
     },
     {
+      "id": "lfm2-350m-nk-risk",
+      "key": "lfm2nk",
+      "name": "LFM2 350M NK Risk",
+      "type": "self-hosted",
+      "priority": 8,
+      "context_length": 8192,
+      "owned_by": "signal38",
+      "description": "LFM2 350M fine-tuned on GDELT NK military events — geopolitical risk analyst",
+      "routing_category": "general"
+    },
+    {
       "id": "lfm2-350m-stepgame",
       "key": "lfm2spatial",
       "name": "LFM2 350M StepGame",

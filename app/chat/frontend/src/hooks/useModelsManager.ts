@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { Model } from '../types';
 import { usePersistedSetting } from './usePersistedSetting';
+import { BROWSER_CAPABLE_MODEL_IDS } from '../utils/browserInference';
 
 // Stable per-model color derived from its id — gives each model a distinct hue
 function modelColor(seed: string): string {
@@ -207,6 +208,10 @@ export function useModelsManager() {
     }
     // "auto" is available whenever at least one self-hosted model is online
     if (onlineKeys.size > 0) online.add('auto');
+    // Browser-capable models are always selectable — they fall back to in-browser ONNX
+    for (const id of BROWSER_CAPABLE_MODEL_IDS) {
+      if (modelsData.some(m => m.id === id)) online.add(id);
+    }
     return online;
   }, [onlineKeys, modelsData]);
 

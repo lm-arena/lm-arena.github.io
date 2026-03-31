@@ -19,6 +19,7 @@ run-name: "${{ inputs.model }}"
           - lfm2mini
           - lfm2spatial
           - falcon
+          - lfm2nk
           - jancode
           - qwen7b
           - gptoss

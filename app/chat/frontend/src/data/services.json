@@ -89,6 +89,14 @@
       "rank": 7
     },
     {
+      "key": "lfm2nk",
+      "name": "LFM2 350M NK Risk",
+      "localPort": 8113,
+      "category": "small",
+      "modelId": "lfm2-350m-nk-risk",
+      "rank": 8
+    },
+    {
       "key": "jancode",
       "name": "Jan-code 4B",
       "localPort": 8109,

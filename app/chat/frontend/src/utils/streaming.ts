@@ -1,3 +1,5 @@
+import { streamBrowser, BROWSER_CAPABLE_MODEL_IDS } from './browserInference';
+
 const GITHUB_MODELS_URL = 'https://models.github.ai/inference/chat/completions';
 
 export type RoutingEvent = {
@@ -66,7 +68,11 @@ async function* streamModel(
   const endpoint = payload.modelEndpoints?.[model];
 
   if (!endpoint && !payload.github_token) {
-    yield { event: 'error', model_id: model, error: true, content: `No endpoint configured for model: ${model}` };
+    if (BROWSER_CAPABLE_MODEL_IDS.has(model)) {
+      yield* streamBrowser(model, payload.messages, signal);
+    } else {
+      yield { event: 'error', model_id: model, error: true, content: `No endpoint configured for model: ${model}` };
+    }
     return;
   }
 
